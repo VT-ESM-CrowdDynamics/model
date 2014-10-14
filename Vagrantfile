@@ -46,13 +46,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "virtualbox" do |vb|
   #   # Don't boot with headless mode
-  #   vb.gui = true
+    vb.gui = true
   #
   #   # Use VBoxManage to customize the VM. For example to change memory:
   #   vb.customize ["modifyvm", :id, "--memory", "1024"]
-  # end
+  end
   #
   # View the documentation for the provider you're using for more
   # information on available options.
@@ -127,12 +127,28 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   $script = <<EOF
 
+# sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+# sudo mkswap /swapfile
+# sudo swapon /swapfile
+# echo /swapfile    swap    swap    defaults 0 0 | sudo tee -a /etc/fstab
 
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install -y --no-install-recommends octave \
   octave-benchmark octave-missing-functions octave-mpi octave-parallel
 #mkdir -p /home/vagrant/project || true
+
+# gui stuff
+sudo apt-get install -y --no-install-recommends lxde-core xserver-xorg lightdm \
+  lightdm-gtk-greeter qtoctave # arora # webkit takes lots of memory
+sudo apt-get install -y lxde 
+sudo mkdir /etc/lightdm/lightdm.conf.d/ || true
+echo [SeatDefaults] | sudo tee /etc/lightdm/lightdm.conf.d/12-autologin.conf
+echo autologin-user=vagrant | sudo tee -a \
+  /etc/lightdm/lightdm.conf.d/12-autologin.conf
+echo autologin-user-timeout=1 | sudo tee -a \
+  /etc/lightdm/lightdm.conf.d/12-autologin.conf
+sudo service lightdm restart
 
 EOF
   config.vm.provision "shell",
