@@ -2,11 +2,12 @@
 % trick to allow multiple functions
 1;
 
-global configuration = struct ("dt", NaN, "frames", NaN, "agents", NaN, "goal" ,NaN);
+global configuration;
 
 function init ( config )
   global configuration;
-  configuration = config;
+  defaults = struct ("dt", NaN, "frames", NaN, "agents", 0, "goal", NaN);
+  configuration = catstruct(defaults, config);
   % disp(configuration);
 end
 
@@ -53,6 +54,8 @@ function tracks = start
   % disp(tracks);
 end
 
+% disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
+
 %!test
 %!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
 %!  assert ( start, [1 0 0 0 0 0; 2 2 100 100 100 100; 3 4 200 200 200 200] )
@@ -69,22 +72,27 @@ end
 %!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
 %!  assert ( start, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
 
-%!test
-%!  init ( struct("dt", 2, "frames", 3, "agents",0, "goal",0) )
+%!test % add agents
+%!  init ( struct("dt", 2, "frames", 3, "agents", 1) )
+%!  assert ( start, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
+
+%!test % move to three frames
+%!  init ( struct("dt", 2, "frames", 3, "goal",0) )
 %!  assert ( start, [1 0; 2 2; 3 4] )
 
-%!test
-%!  init ( struct("dt", 2, "frames", 2, "agents",0, "goal",0) )
+%!test % basic output, changing dt
+%!  init ( struct("dt", 2, "frames", 2, "goal",0) )
 %!  assert ( start, [1 0; 2 2] )
 
-%!test
-%!  init ( struct("dt", 1, "frames", 2, "agents",0, "goal",0) )
+%!test % for basic, two-frame, no-agent output
+%!  init ( struct("dt", 1, "frames", 2, "goal",0) )
 %!  assert ( start, [1 0; 2 1] )
 
-%!test
-%!  init ( struct("dt", 1, "frames", 1, "agents",0) )
+%!test % for basic, one-frame, no-agent output
+%!  init ( struct("dt", 1, "frames", 1) )
 %!  assert ( start, [1, 0] )
 
-%!test init ( struct("dt", 1, "frames", 1, "agents",0) )
+%!test % that init doesn't throw an error
+%!  init ( struct("dt", 1, "frames", 1) )
 
 test engine.m
