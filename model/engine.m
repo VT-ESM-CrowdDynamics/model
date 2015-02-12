@@ -30,9 +30,19 @@ function tracks = start
         Ypos = tracks(frame-1, agent +3) + 100;
         current_frame = [current_frame Xpos Ypos];
         elseif(configuration.goal == 2)
-      %  Xpos = tracks(frame-1, agent +2) + 0.5*Xforce*(configuration.dt)^2 + tracks(frame-2, agent+2)-tracks(frame-1, agent+2);
-      %  Ypos = tracks(frame-1, agent +3) + 100;
-       % current_frame = [current_frame Xpos Ypos];
+           if (frame == 2)
+              	 Xpos = tracks(frame-1, agent +2) + 0.5*Xforce*(configuration.dt)^2 + InitialXvelocity;
+        	 Ypos = tracks(frame-1, agent +3) + 0.5*Yforce*(configuration.dt)^2 + InitialYvelocity;
+           else
+           	% velocity is current position - last position / dt
+           	Xvel = (tracks(frame-2, agent+2)-tracks(frame-1, agent+2))/configuratiobn.dt;
+           	Yvel = (tracks(frame-2, agent+3)-tracks(frame-1, agent+3))/configuration.dt;
+           	Xforce = 500;
+           	Yforce = 500; 
+      	  Xpos = tracks(frame-1, agent +2) + 0.5*Xforce*(configuration.dt)^2 + Xvel;
+       	 Xpos = tracks(frame-1, agent +2) + 0.5*Xforce*(configuration.dt)^2 + Yvel;
+     	   current_frame = [current_frame Xpos Ypos];
+           end
         else
          current_frame = [current_frame 0 0];
       end
@@ -44,7 +54,7 @@ function tracks = start
 end
 
 %!test
-%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 2) )
+%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
 %!  assert ( start, [1 0 0 0 0 0; 2 2 100 100 100 100; 3 4 200 200 200 200] )
 
 %!test
