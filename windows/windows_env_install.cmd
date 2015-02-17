@@ -9,8 +9,8 @@ start /wait vagrant_1.6.5.msi /qb /passive /norestart
 set PATH=%PATH%;C:\HashiCorp\Vagrant\bin
 C:
 cd %USERPROFILE%\Desktop
-"C:\Program Files (x86)\Git\bin\sh.exe" --login -i -c 'git clone https://github.com/automaticgiant/2014-VTESM-Crowd_Model.git'
-cd 2014-VTESM-Crowd_Model
+"C:\Program Files (x86)\Git\bin\sh.exe" --login -i -c 'git clone https://github.com/VT-ESM-CrowdDynamics/model.git'
+cd model
 vagrant up
 powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.dropbox.com/s/2n3yr6mawbtz363/sh.cmd?dl=1', 'sh.cmd')"
 sh.cmd
