@@ -2,11 +2,18 @@
 % trick to allow multiple functions
 1;
 
+addpath('../lib/jsonlab');
+addpath('../lib/catstruct');
+
 global configuration;
 
 function init ( config )
   global configuration;
-  defaults = struct ("dt", NaN, "frames", NaN, "agents", 0, "goal", NaN);
+  defaults = loadjson('defaults.json');
+  % if passed a filename, parse as JSON and use for config
+  if(ischar(config) && exist(config, 'file'))
+    config = loadjson(config)
+  end
   configuration = catstruct(defaults, config);
   % disp(configuration);
 end
@@ -19,6 +26,7 @@ function tracks = start
   for frame = 2 : configuration.frames
   % if configuration.frames == 2
     %disp("poop");
+
     % disp(configuration);
 
     %build current_frame to have frame # and time
@@ -89,6 +97,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 end
 % disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
 
+
 %!test
 %! assert( ForceFromAnotherAgent([0,0],[0,0],[1500,0],[0,0]) ,[-1/((1500-300)/1200)^3,0], 0.00001 )
 
@@ -97,6 +106,10 @@ end
 
 %!test
 %! assert( ForceFromAnotherAgent([0,0],[0,0],[501,0],[0,0]) , [-1/((501-300)/1200)^3,0] , 0.00001)
+
+%!test % previous test, "move to three frames", but from JSON config
+%!  init ( 'testfiles/config_read_test.json' )
+%!  assert ( start, [1 0; 2 2; 3 4] )
 
 %!test % increment with some force and velocity
 %!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
