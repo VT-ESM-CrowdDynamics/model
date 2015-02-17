@@ -18,7 +18,7 @@ function tracks = start
   tracks(1,1) = 1 ;% frame 1 is time 0
   for frame = 2 : configuration.frames
   % if configuration.frames == 2
-    disp("poop");
+    %disp("poop");
     % disp(configuration);
 
     %build current_frame to have frame # and time
@@ -59,7 +59,44 @@ function tracks = start
   % disp(tracks);
 end
 
+% do we want equal and opposite forces?
+% line of sight, sweep out an arc would be ideal...
+function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, OtherPosVector, VelOther)
+	% lets assume distances are calculated in mm
+	% a person is about... 500mm wide (so radius is 250mm)
+	%disp('in force function')
+	
+	distence = sqrt((AgentPosVector(1)-OtherPosVector(1))^2 + (AgentPosVector(2)-OtherPosVector(2))^2);
+	relativePosOfOther = [OtherPosVector(1)-AgentPosVector(1) , OtherPosVector(2)-AgentPosVector(1)];
+	if (distence <= 500)
+		%people would bump, special handeling? 
+		
+		ForceVector = relativePosOfOther/distence*1000;
+	elseif (distence <= 1500)
+		% the repulsion zone
+		% if forming a group this distence is too large probably 
+		% this is less then a meter shoulder to shoulder
+		force = 1/((distence-300)/1200)^3 %min 1, mid 5, max 212
+		ForceVector = force*relativePosOfOther*-1/distence;
+	else
+		%flocking
+		%potentially form group? 
+		
+		
+	endif
+	
+	
+end
 % disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
+
+%!test
+%! assert( ForceFromAnotherAgent([0,0],[0,0],[1500,0],[0,0]) ,[-1/((1500-300)/1200)^3,0], 0.00001 )
+
+%!test
+%! assert( ForceFromAnotherAgent([0,0],[0,0],[1000,0],[0,0]) , [-1/((1000-300)/1200)^3,0] , 0.00001)
+
+%!test
+%! assert( ForceFromAnotherAgent([0,0],[0,0],[501,0],[0,0]) , [-1/((501-300)/1200)^3,0] , 0.00001)
 
 %!test % increment with some force and velocity
 %!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
