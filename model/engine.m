@@ -2,11 +2,13 @@
 % trick to allow multiple functions
 1;
 
+addpath('../lib/jsonlab');
+
 global configuration;
 
 function init ( config )
   global configuration;
-  defaults = struct ("dt", NaN, "frames", NaN, "agents", 0, "goal", NaN);
+  defaults = loadjson('defaults.json');
   configuration = catstruct(defaults, config);
   % disp(configuration);
 end
@@ -18,7 +20,7 @@ function tracks = start
   tracks(1,1) = 1 ;% frame 1 is time 0
   for frame = 2 : configuration.frames
   % if configuration.frames == 2
-    disp("poop");
+    % disp("poop");
     % disp(configuration);
 
     %build current_frame to have frame # and time
