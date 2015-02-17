@@ -73,19 +73,27 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 	% lets assume distances are calculated in mm
 	% a person is about... 500mm wide (so radius is 250mm)
 	%disp('in force function')
-	
+	% maybe this function shouldnt be called for 2 people in a group, and they should have their own function, each agent could hold a list of other agents they are 'grouped' with or something
 	distence = sqrt((AgentPosVector(1)-OtherPosVector(1))^2 + (AgentPosVector(2)-OtherPosVector(2))^2);
-	relativePosOfOther = [OtherPosVector(1)-AgentPosVector(1) , OtherPosVector(2)-AgentPosVector(1)];
+	relativePosOfOther = [OtherPosVector(1)-AgentPosVector(1) , OtherPosVector(2)-AgentPosVector(2)];
+	% we may want to specify persons size in the config files? (ie let user change it)
+	% maybe each agent has a diff number here in if statement for size 
 	if (distence <= 500)
 		%people would bump, special handeling? 
-		
+		%force should be "infinite" bc agents cannot move closer 
+		% should we output # of collisions for user data?
 		ForceVector = relativePosOfOther/distence*1000;
+	% probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
+	% should groups be handled in this function or another function designed spcifically for groups?
 	elseif (distence <= 1500)
 		% the repulsion zone
 		% if forming a group this distence is too large probably 
 		% this is less then a meter shoulder to shoulder
 		force = 1/((distence-300)/1200)^3 %min 1, mid 5, max 212
 		ForceVector = force*relativePosOfOther*-1/distence;
+		
+		% something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
+		% determine probability of wanting to 'dodge' right or left (culture) (should user set this?)
 	else
 		%flocking
 		%potentially form group? 
@@ -97,14 +105,19 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 end
 % disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
 
+%!test % tests the force function for repulsion zone, make 3,4,5 triangle for ez math
+%! assert( ForceFromAnotherAgent([1100,1800],[0,0],[500,1000],[0,0]) ,[1/((1000-300)/1200)^3*3/5,1/((1000-300)/1200)^3*4/5], 0.00001 )
 
-%!test
+%!test % tests the force function for repulsion zone, make 3,4,5 triangle for ez math
+%! assert( ForceFromAnotherAgent([500,1000],[0,0],[1100,1800],[0,0]) ,[-1/((1000-300)/1200)^3*3/5,-1/((1000-300)/1200)^3*4/5], 0.00001 )
+
+%!test % tests the force function for simple case repulsion zone
 %! assert( ForceFromAnotherAgent([0,0],[0,0],[1500,0],[0,0]) ,[-1/((1500-300)/1200)^3,0], 0.00001 )
 
-%!test
+%!test % tests the force function for simple case repulsion zone
 %! assert( ForceFromAnotherAgent([0,0],[0,0],[1000,0],[0,0]) , [-1/((1000-300)/1200)^3,0] , 0.00001)
 
-%!test
+%!test % tests the force function for simple case repulsion zone
 %! assert( ForceFromAnotherAgent([0,0],[0,0],[501,0],[0,0]) , [-1/((501-300)/1200)^3,0] , 0.00001)
 
 %!test % previous test, "move to three frames", but from JSON config
