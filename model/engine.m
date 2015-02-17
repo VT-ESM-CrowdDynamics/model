@@ -3,12 +3,17 @@
 1;
 
 addpath('../lib/jsonlab');
+addpath('../lib/catstruct');
 
 global configuration;
 
 function init ( config )
   global configuration;
   defaults = loadjson('defaults.json');
+  % if passed a filename, parse as JSON and use for config
+  if(ischar(config) && exist(config, 'file'))
+    config = loadjson(config)
+  end
   configuration = catstruct(defaults, config);
   % disp(configuration);
 end
@@ -62,6 +67,10 @@ function tracks = start
 end
 
 % disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
+
+%!test % previous test, "move to three frames", but from JSON config
+%!  init ( 'testfiles/config_read_test.json' )
+%!  assert ( start, [1 0; 2 2; 3 4] )
 
 %!test % increment with some force and velocity
 %!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
