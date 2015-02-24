@@ -41,7 +41,8 @@ for frame = 2 : configuration.frames
 
     %build current_frame to have frame # and time
     current_frame = [tracks(frame-1, 1) + 1, tracks(frame-1, 2) + configuration.dt];
-    % for over each agent in the model
+    % for over each agent in the 
+    MainForceVector = zeros(1,configuration.agents*2);
     for agent = 1:configuration.agents
     	%disp(agent)
     	currentAgentFileSpot = agent*2;
@@ -75,29 +76,51 @@ for frame = 2 : configuration.frames
         	% initialise a force vector for the method return
            	ForceVector = [0,0];
            	% itterate over each other agent
-           	for otherAgent = 1:(configuration.agents -1)
+           	for otherAgent = 1:configuration.agents
            		if (otherAgent != agent)
            			% calculate the force vector, and add it to the current running force total
-           			ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel)
+           			ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
            		end
            	end
+           	MainForceVector(agent*2-1) = ForceVector(1);
+           	MainForceVector(agent*2) = ForceVector(2);
+           	
            	% dummy variable for velocity below
-           	previousPos = agentStruct(agent).pos
+           	%previousPos = agentStruct(agent).pos
            	% calculate the new position att + vt + x
-                    	agentStruct(agent).pos = agentStruct(agent).pos + ForceVector*(configuration.dt)^2 + agentStruct(agent).vel*configuration.dt
+                    	%agentStruct(agent).pos = agentStruct(agent).pos + ForceVector*(configuration.dt)^2 + agentStruct(agent).vel*configuration.dt
                     	% calculate new velocity (current pos - previous pos) / t
-                    	agentStruct(agent).vel = (agentStruct(agent).pos - previousPos)/configuration.dt
+                    	%agentStruct(agent).vel = (agentStruct(agent).pos - previousPos)/configuration.dt
                     	% get position for file
-                    	Xpos = agentStruct(agent).pos(1);
-                    	Ypos = agentStruct(agent).pos(2);
+                    	%Xpos = agentStruct(agent).pos(1);
+                    	%Ypos = agentStruct(agent).pos(2);
                     	%update file
-     	current_frame = [current_frame Xpos Ypos];
+     	%current_frame = [current_frame Xpos Ypos];
         else
        	  current_frame = [current_frame 0 0];
       end
     end
-    % update the array 
+    if (configuration.goal == 3)
+    	for theAgent = 1:configuration.agents
+    		disp(theAgent)
+    		
+    		Force = [MainForceVector(theAgent*2-1), MainForceVector(theAgent*2)]
+    	% dummy variable for velocity below
+           		previousPos = agentStruct(theAgent).pos
+           		% calculate the new position att + vt + x
+                    		agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force*(configuration.dt)^2 + agentStruct(theAgent).vel*configuration.dt
+                    		% calculate new velocity (current pos - previous pos) / t
+                    		agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos)/configuration.dt
+                    		% get position for file
+                    		Xpos = agentStruct(theAgent).pos(1);
+                    		Ypos = agentStruct(theAgent).pos(2);
+                    		%update file
+     		current_frame = [current_frame Xpos Ypos]
+    	% update the array 
+    	end
+    end
     tracks = [tracks; current_frame];
+    
   end
   % disp(tracks);
 end
@@ -116,10 +139,11 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 	% we may want to specify persons size in the config files? (ie let user change it)
 	% maybe each agent has a diff number here in if statement for size 
 	if (distence <= 500)
+		disp('colision')
 		%people would bump, special handeling? 
 		%force should be "infinite" bc agents cannot move closer 
 		% should we output # of collisions for user data?
-		if (distence == 0 ) % if two points are exactly on top it breaks... this should never happen but
+		if (distence < 200 ) % if two points are exactly on top it breaks... this should never happen but
 			ForceVector = [(rand - 0.5)*1000, (rand - 0.5)*1000];
 		else 
 			ForceVector = relativePosOfOther*1000/distence;
@@ -127,6 +151,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 	% probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
 	% should groups be handled in this function or another function designed spcifically for groups?
 	elseif (distence <= 1500)
+		disp('repel')
 		% the repulsion zone
 		% if forming a group this distence is too large probably 
 		% this is less then a meter shoulder to shoulder
@@ -136,6 +161,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 		% something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
 		% determine probability of wanting to 'dodge' right or left (culture) (should user set this?)
 	elseif (distence <= 10000)
+		disp('flock')
 		%flocking
 		%potentially form group? 
 		if (norm(VelOther) > 0.1)
@@ -151,10 +177,38 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 	
 end
 
+function ForceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, wallPoint2)
+	relative = agentPosVector - wallPoint1;
+	lineVector = wallPoint2 - wallPoint1;
+	length = norm(lineVector);
+	
+	if (length > 0)
+	projectionMagnitude = dot(relative, lineVector)/length^2;
+	if (projectionMagnitude <0)
+		%beyond wallPoint1
+		
+	elseif (projectionMagnitude > 0)
+		%beyond wallPoint2
+		
+	else 
+		%closer
+		%the distence matters here
+		distence = norm(cross(lineVector, relative))/length;
+		if (distence <=1250)
+			% need a force
+			direction = [-lineVector(2), lineVector(1)]/length;
+			% need to determine if this direction is right way or if -direction 
+			force = 
+		
+		
+		end
+	end 
+	end 
+end
 % disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
 
 %!test % increment with some force and velocity
-%!  init ( struct("dt", 1, "frames", 4, "agents", 5, "goal", 3) )
+%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 3) )
 %!  disp(start)
 
 %!test % tests the force function for simple case flocking zone
