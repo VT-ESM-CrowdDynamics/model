@@ -1,7 +1,14 @@
-% profile on
+%% defaults
+% profiling
+exist('profiling_enabled') || (profiling_enabled = 0);
 
-%normally 60/120 hz
-frameskip = 200;
+% frames to skip, often 60/120 hz
+exist('frameskip') || (frameskip = 0);
+
+if profiling_enabled 
+	profile on;
+end
+
 for a = 1:11
 	input('', 's');
 end
@@ -11,9 +18,9 @@ line = input('', 's');
 frame = 0;
 while !(strcmp(line, '') || frame > 3000)
 	% disp('main loop')
-	fields = strsplit(line,'\t','CollapseDelimiters',false);
 	% disp(fields(1:2))
 	if mod(frame++, frameskip + 1) == 0
+		fields = strsplit(line,'\t','CollapseDelimiters',false);
 		% next line only good if frame/time was exported from QTM
 		fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})
 
@@ -44,10 +51,12 @@ while !(strcmp(line, '') || frame > 3000)
 	line = input('', 's');
 end
 
-% results=profile('info');
-% show 50 most time spent calls
-% profshow(results, 50)
+if profiling_enabled
+	results=profile('info');
+	% show 50 most time spent calls
+	profshow(results, 50)
 
-% dont work because results is a struct with two structs? or struct arrays? idk
-% csvwrite('FunctionTable', results.FunctionTable)
-% csvwrite('Heirarchical', results.Heirarchical)
+	% dont work because results is a struct with two structs? or struct arrays? idk
+	% csvwrite('FunctionTable', results.FunctionTable)
+	% csvwrite('Heirarchical', results.Heirarchical)
+end
