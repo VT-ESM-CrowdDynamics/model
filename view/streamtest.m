@@ -1,4 +1,4 @@
-% can only stream in data from stdin right now, file reading planned later
+% can only stream in data from stdin - file reading doesn't seem compelling
 % can take "arguments" by using matlab/octave argument to eval variable
 % assignments, like:
 % octave --eval 'frameskip=100;streamtest' < blah.tsv
