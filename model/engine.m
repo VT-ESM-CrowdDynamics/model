@@ -82,6 +82,16 @@ for frame = 2 : configuration.frames
            			ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
            		end
            	end
+           	% iterate over each wall
+           	for wall = 1:configuration.walls
+           		ForceVector 
+           		
+           	end
+           	%iterate over each goal
+           	for goal = 1:configuration.goals
+           		ForceVector
+           		
+           	end
            	MainForceVector(agent*2-1) = ForceVector(1);
            	MainForceVector(agent*2) = ForceVector(2);
            	
@@ -102,20 +112,20 @@ for frame = 2 : configuration.frames
     end
     if (configuration.goal == 3)
     	for theAgent = 1:configuration.agents
-    		disp(theAgent)
+    		%disp(theAgent)
     		
-    		Force = [MainForceVector(theAgent*2-1), MainForceVector(theAgent*2)]
+    		Force = [MainForceVector(theAgent*2-1), MainForceVector(theAgent*2)];
     	% dummy variable for velocity below
-           		previousPos = agentStruct(theAgent).pos
+           		previousPos = agentStruct(theAgent).pos;
            		% calculate the new position att + vt + x
-                    		agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force*(configuration.dt)^2 + agentStruct(theAgent).vel*configuration.dt
+                    		agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force*(configuration.dt)^2 + agentStruct(theAgent).vel*configuration.dt;
                     		% calculate new velocity (current pos - previous pos) / t
-                    		agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos)/configuration.dt
+                    		agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos)/configuration.dt;
                     		% get position for file
                     		Xpos = agentStruct(theAgent).pos(1);
                     		Ypos = agentStruct(theAgent).pos(2);
                     		%update file
-     		current_frame = [current_frame Xpos Ypos]
+     		current_frame = [current_frame Xpos Ypos];
     	% update the array 
     	end
     end
@@ -138,8 +148,15 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 	% relativePosOfOther = [OtherPosVector(1)-AgentPosVector(1) , OtherPosVector(2)-AgentPosVector(2)]
 	% we may want to specify persons size in the config files? (ie let user change it)
 	% maybe each agent has a diff number here in if statement for size 
+	angleOfSight = 1;
+	if (norm(AgentVelVector) > 0)
+		% calculate angle between vel and other's pos, assume agent is looking in direction of velocity 
+		% line of sight
+	angleOfSignt = dot(AgentVelVector,OtherPosVector)/norm(AgentVelVector)/norm(OtherPosVector);
+	end
+	
 	if (distence <= 500)
-		disp('colision')
+		%disp('colision')
 		%people would bump, special handeling? 
 		%force should be "infinite" bc agents cannot move closer 
 		% should we output # of collisions for user data?
@@ -148,64 +165,149 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
 		else 
 			ForceVector = relativePosOfOther*1000/distence;
 		end
+	
 	% probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
 	% should groups be handled in this function or another function designed spcifically for groups?
-	elseif (distence <= 1500)
-		disp('repel')
-		% the repulsion zone
-		% if forming a group this distence is too large probably 
-		% this is less then a meter shoulder to shoulder
-		force = 1/((distence-300)/1200)^3; %min 1, mid 5, max 212
-		ForceVector = force*relativePosOfOther*-1/distence;
-		
-		% something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
-		% determine probability of wanting to 'dodge' right or left (culture) (should user set this?)
-	elseif (distence <= 10000)
-		disp('flock')
-		%flocking
-		%potentially form group? 
-		if (norm(VelOther) > 0.1)
+	elseif (angleOfSight > 0) % person has 180 view
+		if (distence <= 1500)
+			%disp('repel')
+			% the repulsion zone
+			% if forming a group this distence is too large probably 
+			% this is less then a meter shoulder to shoulder
+			force = 1/((distence-300)/1200)^3; %min 1, mid 5, max 212
+			ForceVector = force*relativePosOfOther*-1/distence;
 			
-			ForceVector = 20*VelOther/norm(VelOther);
-		else 
+			% something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
+			% determine probability of wanting to 'dodge' right or left (culture) (should user set this?)
+		elseif (distence <= 10000)
+			%disp('flock')
+			%flocking
+			%potentially form group? 
+			if (norm(VelOther) > 0.1)
+				
+				ForceVector = 20*VelOther/norm(VelOther);
+			else 
+				ForceVector = [0,0];
+			end
+		else
 			ForceVector = [0,0];
 		end
-	else
-		ForceVector = [0,0];
-	endif
+		% adjust for line of sight
+		ForceVector = ForceVector*angleOfSight;
+	end
+	
 	
 	
 end
 
-function ForceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, wallPoint2)
+function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, wallPoint2)
+	%vector from all point to agent
 	relative = agentPosVector - wallPoint1;
+	%vector representing line segment
 	lineVector = wallPoint2 - wallPoint1;
+	%needed constants looked up formula online
+	c1 = dot(relative, lineVector) ;
+	c2 = dot(lineVector, lineVector);
+	%length of line
 	length = norm(lineVector);
-	
-	if (length > 0)
-	projectionMagnitude = dot(relative, lineVector)/length^2;
-	if (projectionMagnitude <0)
+	%dummy variables
+	force = 0;
+	forceFromWall = [0,0];
+	%prjectionMagnitude = 0;
+	%if (length > 0)
+	%projectionMagnitude = dot(relative, lineVector)/length^2;
+	%end
+	if (c1 <= 0)
 		%beyond wallPoint1
-		
-	elseif (projectionMagnitude > 0)
+		distence1 = norm(agentPosVector-wallPoint1) %distence from wallPoint to person
+		if (distence1 != 0)	
+			direction = (agentPosVector - wallPoint1)/distence1;
+			if (distence1 <=1250)
+			
+				force = 1/2/((distence1-100)/1000)^3; %max around 300
+			
+				if (distence1 <= 250)
+				% collision with wall
+				force = 1000;
+				end	
+				 	
+				forceFromWall = force*direction;
+			end
+		else
+			%the person is in the wall, this is bad
+			
+		end
+	elseif (c2 <= c1)
 		%beyond wallPoint2
 		
+		distence2 = norm(agentPosVector-wallPoint2) %distence from wallPoint to person
+		if (distence2 != 0)	
+			direction = (agentPosVector - wallPoint2)/distence2;
+			if (distence2 <=1250)
+			
+				force = 1/2/((distence-100)/1000)^3; %max around 300
+			
+				if (distence2 <= 250)
+				% collision with wall
+				force = 1000;
+				end	
+				 	
+				forceFromWall = force*direction;
+			end
+		else
+			%the person is in the wall, this is bad
+			
+		end
 	else 
 		%closer
 		%the distence matters here
-		distence = norm(cross(lineVector, relative))/length;
-		if (distence <=1250)
-			% need a force
-			direction = [-lineVector(2), lineVector(1)]/length;
-			% need to determine if this direction is right way or if -direction 
-			force = 
-		
-		
+		d = c1/c2;
+		pb = wallPoint1 + d*lineVector %point on line closest to person
+		distence = norm(agentPosVector-pb) %distence from wall to person
+		if (distence != 0)	
+			direction = (agentPosVector - pb)/distence;
+			if (distence <=1250)
+			
+				force = 1/((distence-100)/1000)^3; %max around 300
+			
+				if (distence <= 250)
+				% collision with wall
+				force = 1000;
+				end	
+				 	
+				forceFromWall = force*direction;
+			end
+		else
+			%the person is in the wall, this is bad
+			
 		end
-	end 
+		
 	end 
 end
+
+
+function forceFromGoal = goalForce(agentPosVector, goalLocation, goalRadius)
+	distence = norm(agentPosVector - goalLocation);
+	forceFromGoal = [0,0];
+	if (distence > goalRadius)
+		direction = (agentPosVector - goalLocation)/distence;
+		forceFromGoal = direction*200;
+	end  
+	
+end
 % disp (catstruct(struct("a", "a", "b", "b"), struct("a", 1)))
+
+%!test % simple wall test
+%!   disp(wallForce([-500,0],[0,0],[0,0],[0,5000]))
+%! 
+
+%!test % simple wall test
+%!   disp(wallForce([500,0],[0,0],[0,-5000],[0,5000]))
+%! 
+
+%!test % simple wall test
+%!   disp(wallForce([0,500],[0,0],[-5000,0],[5000,0]))
+%!  
 
 %!test % increment with some force and velocity
 %!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 3) )
