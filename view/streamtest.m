@@ -1,3 +1,10 @@
+% can only stream in data from stdin right now, file reading planned later
+% can take "arguments" by using matlab/octave argument to eval variable
+% assignments, like:
+% octave --eval 'frameskip=100;streamtest' < blah.tsv
+% or
+% matlab -r 'frameskip=100;streamtest' < blah.tsv
+
 %% defaults
 % profiling
 exist('profiling_enabled') || (profiling_enabled = 0);
