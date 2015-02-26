@@ -5,14 +5,47 @@
 % or
 % matlab -r 'frameskip=100;streamtest' < blah.tsv
 
-%% defaults
+% TODO: add "argument" for headerless file
+
+% from: http://stackoverflow.com/a/3628885
+% subindex = @(A,r) A(r);      % An anonymous function to index a matrix
+
+% function parse_header
+% 	line = input('', 's');
+
+% 	while subindex(isletter(line), 1)
+% 		fields = strsplit(line,'\t','CollapseDelimiters',false);
+% 		switch fields{1}
+% 			case 'NO_OF_FRAMES'
+
+% 			case 'FREQUENCY'
+
+% 			case 'DESCRIPTION'
+
+% 			case 'TIME_STAMP'
+
+% 			case 'DATA_INCLUDED'
+
+% 			case 'Frame'
+
+% 		end
+% 	end
+% end
+
+
+% defaults
+
 % profiling
-exist('profiling_enabled') || (profiling_enabled = 0);
+if ~exist('profiling_enabled', 'var')
+	profiling_enabled = 0;
+end
 
 % frames to skip, often 60/120 hz
-exist('frameskip') || (frameskip = 0);
+if ~exist('frameskip', 'var')
+	frameskip = 0;
+end
 
-if profiling_enabled 
+if profiling_enabled
 	profile on;
 end
 
@@ -23,10 +56,11 @@ hold on
 axis([-10000 10000 -10000 10000])
 line = input('', 's');
 frame = 0;
-while !(strcmp(line, '') || frame > 3000)
+while ~(frame > 20)
+	frame = frame + 1;
 	% disp('main loop')
 	% disp(fields(1:2))
-	if mod(frame++, frameskip + 1) == 0
+	if ~mod(frame, frameskip + 1) == 0
 		fields = strsplit(line,'\t','CollapseDelimiters',false);
 		% next line only good if frame/time was exported from QTM
 		fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})
@@ -49,7 +83,7 @@ while !(strcmp(line, '') || frame > 3000)
 		% Ycoords = Ycoords(cellfun('isnumeric',fields(4:2:end)))
 
 		% remove last plotted frame or disable to see tracks
-		if exist('last')
+		if exist('last', 'var')
 			delete(last);
 		end
 		last = plot(Xcoords, Ycoords, 'linestyle', 'none', 'marker', '.');
@@ -59,7 +93,7 @@ while !(strcmp(line, '') || frame > 3000)
 end
 
 if profiling_enabled
-	results=profile('info');
+	results = profile('info');
 	% show 50 most time spent calls
 	profshow(results, 50)
 
