@@ -1,4 +1,4 @@
-1;
+% 1;
 
 function forceFromGoal = goalForce(agentPosVector, goalLocation, goalRadius)
 	distence = norm(agentPosVector - goalLocation);
@@ -10,4 +10,4 @@ function forceFromGoal = goalForce(agentPosVector, goalLocation, goalRadius)
 	
 end
 
-test goalForce.m
+% test goalForce.m

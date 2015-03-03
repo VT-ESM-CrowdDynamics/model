@@ -1,4 +1,4 @@
-1;
+% 1;
 
 function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, wallPoint2)
 	%vector from all point to agent
@@ -99,4 +99,4 @@ end
 %!   disp(wallForce([0,500],[0,0],[-5000,0],[5000,0]))
 %!  
 
-test wallForce.m
+% test wallForce.m

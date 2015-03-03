@@ -1,4 +1,4 @@
-1;
+% 1;
 
 
 % do we want equal and opposite forces?
@@ -84,4 +84,4 @@ end
 %!test % tests the force function for simple case repulsion zone
 %! assert( ForceFromAnotherAgent([0,0],[0,0],[501,0],[0,0]) , [-1/((501-300)/1200)^3,0] , 0.00001)
 
-test ForceFromAnotherAgent.m
+% test ForceFromAnotherAgent.m
