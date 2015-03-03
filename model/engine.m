@@ -1,4 +1,4 @@
-##octave --eval 'test engine.m' 2>&1 | grep -v /usr/share/octave/3.8.1
+% octave --eval 'test engine.m' 2>&1 | grep -v /usr/share/octave/3.8.1
 % trick to allow multiple functions
 1;
 
