@@ -1,6 +1,6 @@
 % octave --eval 'test engine.m' 2>&1 | grep -v /usr/share/octave/3.8.1
 % trick to allow multiple functions
-1;
+% 1;
 
 % TODO: refactor output generation to wrap a step function in a loop to generate
 %       tracks matrix for assertion to keep tests but be able to stream tsv out
@@ -192,4 +192,4 @@ end
 %!test % that init doesn't throw an error
 %!  init ( struct("dt", 1, "frames", 1) )
 
-test engine.m
+% test engine.m
