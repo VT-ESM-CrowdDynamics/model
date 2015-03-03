@@ -4,8 +4,10 @@
 % octave --eval 'frameskip=100;streamtest' < blah.tsv
 % or
 % matlab -r 'frameskip=100;streamtest' < blah.tsv
+% note : vagrant ssh -c "cd git/swarm/view;time head -n 40 game-day\ test2\,\ only\ labeled.tsv | octave --eval 'streamtest'"&time head -n 40 game-day\ test2\,\ only\ labeled.tsv | matlab -r 'streamtest'&
 
 % TODO: add "argument" for headerless file
+% TODO: add file reading switch because debugging streaming sucks
 
 % from: http://stackoverflow.com/a/3628885
 % subindex = @(A,r) A(r);      % An anonymous function to index a matrix
@@ -49,18 +51,23 @@ if profiling_enabled
 	profile on;
 end
 
-for a = 1:11
-	input('', 's');
+for a = 1:12
+	input('','s');
 end
 hold on
 axis([-10000 10000 -10000 10000])
 line = input('', 's');
+% file = fopen('game-day test2, only labeled, first 50.tsv')
+% line = fgetl(file);
+% for a = 1:12
+%     fgetl(file);
+% end
 frame = 0;
-while ~(frame > 20)
+while ~(strcmpi(line,''))
 	frame = frame + 1;
 	% disp('main loop')
 	% disp(fields(1:2))
-	if ~mod(frame, frameskip + 1) == 0
+	if true % ~(mod(frame, frameskip + 1) == 0)
 		fields = strsplit(line,'\t','CollapseDelimiters',false);
 		% next line only good if frame/time was exported from QTM
 		fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})
@@ -90,7 +97,13 @@ while ~(frame > 20)
 		drawnow;
 	end
 	line = input('', 's');
+	% line = fgetl(file);
 end
+if exist('last', 'var')
+	delete(last);
+end
+% fclose(file);
+% disp('done');
 
 if profiling_enabled
 	results = profile('info');
