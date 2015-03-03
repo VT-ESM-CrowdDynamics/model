@@ -24,7 +24,7 @@ function init (config)
 end
 
 function tracks = looptest
-
+  global configuration;
   % tracks = [[1, 0]];
 
   tracks(1, 1) = 1; % frame 1 is time 0
@@ -82,7 +82,7 @@ function tracks = looptest
         ForceVector = [0, 0];
         % itterate over each other agent
         for otherAgent = 1:configuration.agents
-          if (otherAgent ! = agent)
+          if (otherAgent != agent)
             % calculate the force vector, and add it to the current running force total
             ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
           end
@@ -141,55 +141,55 @@ function tracks = looptest
 end
 
 
-% !test % increment with some force and velocity
-% !  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 3) )
-% !  disp(looptest)
+%!test % increment with some force and velocity
+%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 3) )
+%!  disp(looptest)
 
-% !test % previous test, "move to three frames", but from JSON config
-% !  init ( 'testfiles/config_read_test.json' )
-% !  assert ( looptest, [1 0; 2 2; 3 4] )
+%!test % previous test, "move to three frames", but from JSON config
+%!  init ( 'testfiles/config_read_test.json' )
+%!  assert ( looptest, [1 0; 2 2; 3 4] )
 
-% !test % increment with some force and velocity
-% !  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
-% !  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
+%!test % increment with some force and velocity
+%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
+%!  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
 
-% !test % increment with some force and velocity
-% !  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
-% !  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
+%!test % increment with some force and velocity
+%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
+%!  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
 
-% !test % tests 2 agents with changing position
-% !  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
-% !  assert ( looptest, [1 0 0 0 0 0; 2 2 100 100 100 100; 3 4 200 200 200 200] )
+%!test % tests 2 agents with changing position
+%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
+%!  assert ( looptest, [1 0 0 0 0 0; 2 2 100 100 100 100; 3 4 200 200 200 200] )
 
-% !test % tests 2 agents
-% !  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal",0) )
-% !  assert ( looptest, [1 0 0 0 0 0; 2 2 0 0 0 0; 3 4 0 0 0 0] )
+%!test % tests 2 agents
+%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal",0) )
+%!  assert ( looptest, [1 0 0 0 0 0; 2 2 0 0 0 0; 3 4 0 0 0 0] )
 
-% !test
-% !  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
-% !  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
+%!test
+%!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
+%!  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
 
-% !test % add agents
-% !  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
-% !  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
+%!test % add agents
+%!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
+%!  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
 
-% !test % move to three frames
-% !  init ( struct("dt", 2, "frames", 3, "goal",0) )
-% !  assert ( looptest, [1 0; 2 2; 3 4] )
+%!test % move to three frames
+%!  init ( struct("dt", 2, "frames", 3, "goal",0) )
+%!  assert ( looptest, [1 0; 2 2; 3 4] )
 
-% !test % basic output, changing dt
-% !  init ( struct("dt", 2, "frames", 2, "goal",0) )
-% !  assert ( looptest, [1 0; 2 2] )
+%!test % basic output, changing dt
+%!  init ( struct("dt", 2, "frames", 2, "goal",0) )
+%!  assert ( looptest, [1 0; 2 2] )
 
-% !test % for basic, two-frame, no-agent output
-% !  init ( struct("dt", 1, "frames", 2, "goal",0) )
-% !  assert ( looptest, [1 0; 2 1] )
+%!test % for basic, two-frame, no-agent output
+%!  init ( struct("dt", 1, "frames", 2, "goal",0) )
+%!  assert ( looptest, [1 0; 2 1] )
 
-% !test % for basic, one-frame, no-agent output
-% !  init ( struct("dt", 1, "frames", 1) )
-% !  assert ( looptest, [1, 0] )
+%!test % for basic, one-frame, no-agent output
+%!  init ( struct("dt", 1, "frames", 1) )
+%!  assert ( looptest, [1, 0] )
 
-% !test % that init doesn't throw an error
-% !  init ( struct("dt", 1, "frames", 1) )
+%!test % that init doesn't throw an error
+%!  init ( struct("dt", 1, "frames", 1) )
 
 test engine.m
