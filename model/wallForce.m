@@ -19,7 +19,7 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 	%end
 	if (c1 <= 0)
 		%beyond wallPoint1
-		distence1 = norm(agentPosVector-wallPoint1) %distence from wallPoint to person
+		distence1 = norm(agentPosVector-wallPoint1); %distence from wallPoint to person
 		if (distence1 != 0)	
 			direction = (agentPosVector - wallPoint1)/distence1;
 			if (distence1 <=1250)
@@ -40,12 +40,12 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 	elseif (c2 <= c1)
 		%beyond wallPoint2
 		
-		distence2 = norm(agentPosVector-wallPoint2) %distence from wallPoint to person
+		distence2 = norm(agentPosVector-wallPoint2); %distence from wallPoint to person
 		if (distence2 != 0)	
 			direction = (agentPosVector - wallPoint2)/distence2;
 			if (distence2 <=1250)
 			
-				force = 1/2/((distence-100)/1000)^3; %max around 300
+				force = 1/2/((distence2-100)/1000)^3; %max around 300
 			
 				if (distence2 <= 250)
 				% collision with wall
@@ -62,8 +62,8 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 		%closer
 		%the distence matters here
 		d = c1/c2;
-		pb = wallPoint1 + d*lineVector %point on line closest to person
-		distence = norm(agentPosVector-pb) %distence from wall to person
+		pb = wallPoint1 + d*lineVector; %point on line closest to person
+		distence = norm(agentPosVector-pb); %distence from wall to person
 		if (distence != 0)	
 			direction = (agentPosVector - pb)/distence;
 			if (distence <=1250)
