@@ -161,8 +161,8 @@ function current_frame = timestep(buffer_zero)
         % disp("GOALS");
         % agentStruct(agent).goalNum
        
-        G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:) %get the goal array
-        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]) % get goal force from function
+        G = configuration.goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:); %get the goal array
+        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]); % get goal force from function
         % while the goal force is zero and there are more goals in the path calc a new force with the next goal
         % norm(forceFromGoal) 
         % agentStruct(agent).goalNum
@@ -210,7 +210,7 @@ function current_frame = timestep(buffer_zero)
         % calculate new velocity (current pos - previous pos) / t
         agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
         %this movement exceeded the max allowed velocity
-        if (agentStruct(agent).velocity > agentStruct(agent).maxVel)
+        if (agentStruct(agent).vel > agentStruct(agent).maxVel)
         	% get direction of movement
         	direction = agentStruct(agent).vel/norm(agentStruct(agent).vel);
         	% set velocity in that direction to be max velocity
