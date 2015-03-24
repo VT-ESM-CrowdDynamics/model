@@ -37,12 +37,12 @@ function tracks = looptest
   % array of wall points
   % needs to be configured from the starting file
   % 1ft = 304.8mm (300)
-  wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
+  configuration.wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
   % array of goals [x1,y1,x2,y2] for each goal
-  goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
+  configuration.goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
   % array of possible paths from goal to goal, path# assigned randomly to each agent
   % for example in T intersection can have two path# each to one exit
-  % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call goalArray(2) then goalArray(5)
+  % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call configuration.goalArray(2) then configuration.goalArray(5)
   % as the agent moves from goal to goal
   goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
   paths = 2; % # of possible paths for each spawn
@@ -55,6 +55,7 @@ function tracks = looptest
     % randomly spawn agents in spawn points
     % wont work right now bc all agents will spawn too close
     % need to populate hallways one by one
+<<<<<<< HEAD
     %disp(agent)
     thisSpawn = randi([1 3]);
     agentStruct(agent) = spawnDude(thisSpawn);
@@ -91,6 +92,7 @@ function tracks = looptest
     % disp(frame)
     % disp(buffer)
     current_frame = timestep(frame);
+    % disp(sprintf('%d\t', current_frame))
     tracks = [tracks; current_frame];
     % disp('-------')
   end
