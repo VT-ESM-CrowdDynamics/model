@@ -1,7 +1,6 @@
 % 1;
 
 function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
-	
 	%vector from all point to agent
 	relative = agentPosVector - goalPoint1;
 	%vector representing line segment

@@ -87,16 +87,16 @@ end
 
 
 
-%!test % simple wall test
-%!   disp(wallForce([-500,0],[0,0],[0,0],[0,5000]))
-%! 
-
-%!test % simple wall test
-%!   disp(wallForce([500,0],[0,0],[0,-5000],[0,5000]))
-%! 
-
-%!test % simple wall test
-%!   disp(wallForce([0,500],[0,0],[-5000,0],[5000,0]))
-%!  
+%%!test % simple wall test
+%%!   disp(wallForce([-500,0],[0,0],[0,0],[0,5000]))
+%%! 
+%
+%%!test % simple wall test
+%%!   disp(wallForce([500,0],[0,0],[0,-5000],[0,5000]))
+%%! 
+%
+%%!test % simple wall test
+%%!   disp(wallForce([0,500],[0,0],[-5000,0],[5000,0]))
+%%!  
 
 % test wallForce.m

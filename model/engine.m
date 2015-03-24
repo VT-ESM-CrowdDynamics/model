@@ -35,12 +35,12 @@ function tracks = looptest
   % array of wall points
   % needs to be configured from the starting file
   % 1ft = 304.8mm (300)
-  wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
+  configuration.wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
   % array of goals [x1,y1,x2,y2] for each goal
-  goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
+  configuration.goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
   % array of possible paths from goal to goal, path# assigned randomly to each agent
   % for example in T intersection can have two path# each to one exit
-  % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call goalArray(2) then goalArray(5)
+  % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call configuration.goalArray(2) then configuration.goalArray(5)
   % as the agent moves from goal to goal
   goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
   paths = 2; % # of possible paths for each spawn
@@ -52,19 +52,19 @@ function tracks = looptest
     % randomly spawn agents in spawn points
     % wont work right now bc all agents will spawn too close
     % need to populate hallways one by one
-    thisSpawn = randi([1 3])
-    thisPath = randi([1 2])
+    thisSpawn = randi([1 3]);
+    thisPath = randi([1 2]);
     spawn = spawnArray(thisSpawn,:); % get the random spawn line
     thePath = goalPath(thisPath,:,thisSpawn); % get the random path 
     if (spawn(1) > spawn(3))
-      positionX = randi([spawn(3) spawn(1)])
+      positionX = randi([spawn(3) spawn(1)]);
     else
-      positionX = randi([spawn(1) spawn(3)])
+      positionX = randi([spawn(1) spawn(3)]);
     end
     if (spawn(2) > spawn(4))
-      positionY = randi([spawn(4) spawn(2)])
+      positionY = randi([spawn(4) spawn(2)]);
     else
-      positionY = randi([spawn(2) spawn(4)])
+      positionY = randi([spawn(2) spawn(4)]);
     end
     agentStruct(agent).pos = [positionX, positionY];
     agentStruct(agent).vel = [0, 0];
@@ -85,6 +85,7 @@ function tracks = looptest
     % disp(frame)
     % disp(buffer)
     current_frame = timestep(frame);
+    % disp(sprintf('%d\t', current_frame))
     tracks = [tracks; current_frame];
     % disp('-------')
   end
@@ -153,21 +154,21 @@ function current_frame = timestep(buffer_zero)
         end
         % iterate over each wall
         for wall = 1:5 %configuration.walls
-          ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, wallPoints(wall*2 - 1), wallPoints(wall*2));
+          ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, configuration.wallPoints(wall*2 - 1), configuration.wallPoints(wall*2));
 
         end
         % iterate over each goal
         % disp("GOALS");
-        agentStruct(agent).goalNum
+        % agentStruct(agent).goalNum
        
         G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:) %get the goal array
         forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]) % get goal force from function
         % while the goal force is zero and there are more goals in the path calc a new force with the next goal
-        norm(forceFromGoal) 
-        agentStruct(agent).goalNum
-        agentStruct(agent).pathLength
+        % norm(forceFromGoal) 
+        % agentStruct(agent).goalNum
+        % agentStruct(agent).pathLength
         while(norm(forceFromGoal) < 1 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
-        disp("in the goal loop")
+        % disp("in the goal loop")
           agentStruct(agent).goalNum = agentStruct(agent).goalNum + 1;
           G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
           forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]);
