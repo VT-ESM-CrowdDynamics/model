@@ -24,6 +24,8 @@ function init (config)
 end
 
 function tracks = looptest
+  global wallPoints;
+  global goalArray;
   global configuration;
   % tracks = [[1, 0]];
   % TODO: init stuff needs to move to init
@@ -73,9 +75,10 @@ function tracks = looptest
     %
     agentStruct(agent).goalNum = 1;
     agentStruct(agent).goalPath = thePath;
-    agentStruct(agent).pathLength = size(thePath);
+    agentStruct(agent).pathLength = size(thePath)(2);
     agentStruct(agent).inModel = true;
-    agentStruct(agent).maxVel = 4.5;
+    agentStruct(agent).maxVel = 4.5*300;
+    
   end
 
   % disp('start tracks')
@@ -97,10 +100,12 @@ end
 
 % pass in agentstruct? is deprecated - remove when possible
 function current_frame = timestep(buffer_zero)
+
     global configuration;
     global buffer;
     global agentStruct;
-
+    global wallPoints;
+    global goalArray;
     % TODO: change to timestep
     % if configuration.frames == 2
     % disp("poop");
@@ -112,36 +117,37 @@ function current_frame = timestep(buffer_zero)
     % for over each agent in the
     MainForceVector = zeros(1, configuration.agents * 2);
     for agent = 1:configuration.agents
+    maxDistence = agentStruct(agent).maxVel*configuration.dt;
       % disp('agent')
       % disp(agent)
       currentAgentFileSpot = agent * 2;
-      if (configuration.goal == 1)
-        Xpos = buffer(tminus(1, buffer_zero), agent + 2) + 100;
-        Ypos = buffer(tminus(1, buffer_zero), agent + 3) + 100;
-        current_frame = [current_frame Xpos Ypos];
-      elseif (configuration.goal == 2)
-        if (buffer(tminus(1, buffer_zero), 1) == NaN)
-
-          InitialXvelocity = 50;
-          InitialYvelocity = 50;
-          Xforce = 0;
-          Yforce = 0;
-
-          Xpos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) + Xforce * (configuration.dt) ^ 2 + InitialXvelocity;
-          Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + InitialYvelocity;
-          current_frame = [current_frame Xpos Ypos];
-        else
-          % velocity is current position - last position / dt
-          Xvel = (buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) - buffer(tminus(2, buffer_zero), currentAgentFileSpot + 1)) / configuration.dt;
-          Yvel = (buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) - buffer(tminus(2, buffer_zero), currentAgentFileSpot + 2)) / configuration.dt;
-          Xforce = 5;
-          Yforce = 5;
-          Xpos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) + Xforce * (configuration.dt) ^ 2 + Xvel;
-          Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + Yvel;
-          current_frame = [current_frame Xpos Ypos];
-        end
+      %if (configuration.goal == 1)
+        %Xpos = buffer(tminus(1, buffer_zero), agent + 2) + 100;
+        %Ypos = buffer(tminus(1, buffer_zero), agent + 3) + 100;
+        %current_frame = [current_frame Xpos Ypos];
+      %elseif (configuration.goal == 2)
+        %if (buffer(tminus(1, buffer_zero), 1) == NaN)
+%
+          %InitialXvelocity = 50;
+          %InitialYvelocity = 50;
+          %Xforce = 0;
+          %Yforce = 0;
+%
+          %Xpos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) + Xforce * (configuration.dt) ^ 2 + InitialXvelocity;
+          %Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + InitialYvelocity;
+          %current_frame = [current_frame Xpos Ypos];
+        %else
+          %% velocity is current position - last position / dt
+          %Xvel = (buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) - buffer(tminus(2, buffer_zero), currentAgentFileSpot + 1)) / configuration.dt;
+          %Yvel = (buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) - buffer(tminus(2, buffer_zero), currentAgentFileSpot + 2)) / configuration.dt;
+          %Xforce = 5;
+          %Yforce = 5;
+          %Xpos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) + Xforce * (configuration.dt) ^ 2 + Xvel;
+          %Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + Yvel;
+          %current_frame = [current_frame Xpos Ypos];
+        %end
       % NEW goal using vectors and actual force function for calculations
-      elseif (configuration.goal == 3)
+      if (configuration.goal == 3)
         % initialise a force vector for the method return
         ForceVector = [0, 0];
         % itterate over each other agent
@@ -151,21 +157,20 @@ function current_frame = timestep(buffer_zero)
             ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
           end
         end
+        
         % iterate over each wall
         for wall = 1:5 %configuration.walls
-          ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, wallPoints(wall*2 - 1), wallPoints(wall*2));
+          ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, wallPoints(wall*2 - 1,:), wallPoints(wall*2,:), maxDistence);
 
         end
         % iterate over each goal
-        % disp("GOALS");
-        agentStruct(agent).goalNum
-       
+        disp("GOALS");
+        
         G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:) %get the goal array
-        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]) % get goal force from function
-        % while the goal force is zero and there are more goals in the path calc a new force with the next goal
-        norm(forceFromGoal) 
+        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence); % get goal force from function
+        % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
         agentStruct(agent).goalNum
-        agentStruct(agent).pathLength
+        agentStruct(agent).pos
         while(norm(forceFromGoal) < 1 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
         disp("in the goal loop")
           agentStruct(agent).goalNum = agentStruct(agent).goalNum + 1;
@@ -209,7 +214,7 @@ function current_frame = timestep(buffer_zero)
         % calculate new velocity (current pos - previous pos) / t
         agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
         %this movement exceeded the max allowed velocity
-        if (agentStruct(agent).velocity > agentStruct(agent).maxVel)
+        if (agentStruct(agent).vel > agentStruct(agent).maxVel)
         	% get direction of movement
         	direction = agentStruct(agent).vel/norm(agentStruct(agent).vel);
         	% set velocity in that direction to be max velocity
@@ -231,9 +236,9 @@ function current_frame = timestep(buffer_zero)
 end
 
 
-%%!test % increment with some force and velocity
-%%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 3) )
-%%!  disp(looptest)
+%!test % increment with some force and velocity
+%!  init ( struct("dt", 0.2, "frames", 60, "agents", 1, "goal", 3) )
+%!  disp(looptest/300)
 
 %!test % previous test, "move to three frames", but from JSON config
 %!  init ( 'testfiles/config_read_test.json' )

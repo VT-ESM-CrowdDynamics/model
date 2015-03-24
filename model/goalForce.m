@@ -1,6 +1,6 @@
 % 1;
 
-function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
+function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2, maxDistence)
 	
 	%vector from all point to agent
 	relative = agentPosVector - goalPoint1;
@@ -21,7 +21,7 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
 	if (c1 <= 0)
 		%beyond goalPoint1
 		distence1 = norm(agentPosVector-goalPoint1); %distence from goalPoint to person
-		if (distence1 > 100)	
+		if (distence1 > maxDistence)	
 			direction = (agentPosVector - goalPoint1)/distence1;
 			force = -250; 
 			forceFromGoal = force*direction;
@@ -34,7 +34,7 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
 		%beyond goalPoint2
 		
 		distence2 = norm(agentPosVector-goalPoint2); %distence from goalPoint to person
-		if (distence2 > 100)	
+		if (distence2 > maxDistence)	
 			direction = (agentPosVector - goalPoint1)/distence2;
 			force = -250; 
 			forceFromGoal = force*direction;
@@ -46,7 +46,7 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
 		d = c1/c2;
 		pb = goalPoint1 + d*lineVector; %point on line closest to person
 		distence3 = norm(agentPosVector-pb) %distence from wall to person
-		if (distence3 > 100)	
+		if (distence3 > maxDistence)	
 			direction = (agentPosVector - pb)/distence3;
 			force = -250; 
 			forceFromGoal = force*direction;
