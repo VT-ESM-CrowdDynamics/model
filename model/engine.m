@@ -55,7 +55,6 @@ function tracks = looptest
     % randomly spawn agents in spawn points
     % wont work right now bc all agents will spawn too close
     % need to populate hallways one by one
-<<<<<<< HEAD
     %disp(agent)
     thisSpawn = randi([1 3]);
     agentStruct(agent) = spawnDude(thisSpawn);
