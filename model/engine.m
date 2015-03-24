@@ -32,13 +32,49 @@ function tracks = looptest
   buffer(1, 1) = 1; % frame 1 is time 0
   global agentStruct;
   agentStruct = struct;
+  % array of wall points
+  % needs to be configured from the starting file
+  % 1ft = 304.8mm (300)
+  wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
+  % array of goals [x1,y1,x2,y2] for each goal
+  goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
+  % array of possible paths from goal to goal, path# assigned randomly to each agent
+  % for example in T intersection can have two path# each to one exit
+  % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call goalArray(2) then goalArray(5)
+  % as the agent moves from goal to goal
+  goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
+  paths = 2; % # of possible paths for each spawn
+  spawns = 3; % # possible spawns
+  % array of spawns like goals
+  spawnArray = [[-4,-20,4,-20];[-14,0,-14,8];[14,0,14,8]]*300;
   % setup needs to place agents in model and give properties etc
   for agent = 1:configuration.agents
-    % currently arbitrary setup
-    agentStruct(agent).pos = [0, 0];
+    % randomly spawn agents in spawn points
+    % wont work right now bc all agents will spawn too close
+    % need to populate hallways one by one
+    thisSpawn = randi([1 3])
+    thisPath = randi([1 2])
+    spawn = spawnArray(thisSpawn,:); % get the random spawn line
+    thePath = goalPath(thisPath,:,thisSpawn); % get the random path 
+    if (spawn(1) > spawn(3))
+      positionX = randi([spawn(3) spawn(1)])
+    else
+      positionX = randi([spawn(1) spawn(3)])
+    end
+    if (spawn(2) > spawn(4))
+      positionY = randi([spawn(4) spawn(2)])
+    else
+      positionY = randi([spawn(2) spawn(4)])
+    end
+    agentStruct(agent).pos = [positionX, positionY];
     agentStruct(agent).vel = [0, 0];
     buffer(1, agent * 2 + 1) = agentStruct(agent).pos(1);
     buffer(1, agent * 2 + 2) = agentStruct(agent).pos(2);
+    %
+    agentStruct(agent).goalNum = 1;
+    agentStruct(agent).goalPath = thePath;
+    agentStruct(agent).pathLength = size(thePath);
+    agentStruct(agent).inModel = true;
   end
 
   % disp('start tracks')
@@ -103,27 +139,38 @@ function current_frame = timestep(buffer_zero)
           Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + Yvel;
           current_frame = [current_frame Xpos Ypos];
         end
-        % NEW goal using vectors and actual force function for calculations
+      % NEW goal using vectors and actual force function for calculations
       elseif (configuration.goal == 3)
         % initialise a force vector for the method return
         ForceVector = [0, 0];
         % itterate over each other agent
         for otherAgent = 1:configuration.agents
-          if (otherAgent != agent)
+          if (otherAgent != agent && agentStruct(agent).inModel)
             % calculate the force vector, and add it to the current running force total
             ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
           end
         end
         % iterate over each wall
-        % for wall = 1:configuration.walls
-        %   ForceVector
+        for wall = 1:5 %configuration.walls
+          ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, wallPoints(wall*2 - 1), wallPoints(wall*2));
 
         % end
         % iterate over each goal
-        % for goal = 1:configuration.goals
-        %   ForceVector
+        disp("GOALS");
+        agentStruct(agent).goalNum
+        G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:)
+        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)])
+        while(norm(forceFromGoal) == 0 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
+          agentStruct(agent).goalNum++;
+          G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
+          forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]);
+        end
+        if (norm(forceFromGoal) == 0)
+          %remove agent they are at the final goal
+          agentStruct(agent).inModel = false;
+        end
+        ForceVector = ForceVector + forceFromGoal; 
 
-        % end
         MainForceVector(agent * 2 - 1) = ForceVector(1);
         MainForceVector(agent * 2) = ForceVector(2);
 
@@ -142,6 +189,7 @@ function current_frame = timestep(buffer_zero)
         current_frame = [current_frame 0 0];
       end
     end
+    % add in all the forces calculated before
     if (configuration.goal == 3)
       for theAgent = 1:configuration.agents
         % disp(theAgent)
