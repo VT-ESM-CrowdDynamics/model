@@ -17,7 +17,7 @@ function init (config)
   defaults = loadjson('defaults.json');
   % if passed a filename, parse as JSON and use for config
   if (ischar(config) && exist(config, 'file'))
-    config = loadjson(config)
+    config = loadjson(config);
   end
   configuration = catstruct(defaults, config);
   % disp(configuration);
@@ -27,8 +27,10 @@ function tracks = looptest
   global configuration;
   % tracks = [[1, 0]];
   % TODO: init stuff needs to move to init
+  global buffer;
   buffer = zeros(configuration.buffer_size, configuration.agents * 2 + 2);
   buffer(1, 1) = 1; % frame 1 is time 0
+  global agentStruct;
   agentStruct = struct;
   % setup needs to place agents in model and give properties etc
   for agent = 1:configuration.agents
@@ -39,14 +41,15 @@ function tracks = looptest
     buffer(1, agent * 2 + 2) = agentStruct(agent).pos(2);
   end
 
-    disp('start tracks')
-    tracks = buffer(1,:)
+  % disp('start tracks')
+  tracks = buffer(1,:);
   for frame = 2 : configuration.frames
-    disp('looping!')
-    disp(frame)
-    disp(buffer)
-    current_frame = timestep(buffer, frame, agentStruct)
+    % disp('looping!')
+    % disp(frame)
+    % disp(buffer)
+    current_frame = timestep(frame);
     tracks = [tracks; current_frame];
+    % disp('-------')
   end
 end
 
@@ -56,8 +59,10 @@ function new_index = tminus(n, buffer_zero)
 end
 
 % pass in agentstruct? is deprecated - remove when possible
-function current_frame = timestep(buffer, buffer_zero, agentStruct)
+function current_frame = timestep(buffer_zero)
     global configuration;
+    global buffer;
+    global agentStruct;
 
     % TODO: change to timestep
     % if configuration.frames == 2
@@ -70,6 +75,7 @@ function current_frame = timestep(buffer, buffer_zero, agentStruct)
     % for over each agent in the
     MainForceVector = zeros(1, configuration.agents * 2);
     for agent = 1:configuration.agents
+      % disp('agent')
       % disp(agent)
       currentAgentFileSpot = agent * 2;
       if (configuration.goal == 1)
@@ -155,6 +161,9 @@ function current_frame = timestep(buffer, buffer_zero, agentStruct)
         % update the array
       end
     end
+    buffer_slot = tminus(0, buffer_zero);
+    buffer(buffer_slot,:) = current_frame;
+    % disp('loop end')
 end
 
 
@@ -164,16 +173,12 @@ end
 
 %!test % previous test, "move to three frames", but from JSON config
 %!  init ( 'testfiles/config_read_test.json' )
-%!  results = looptest
+%!  results = looptest;
 %!  assert ( results, [1 0; 2 2; 3 4] )
 
-%!test % increment with some force and velocity
-%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
-%!  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
-
-%!test % increment with some force and velocity
-%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
-%!  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
+%%!test % increment with some force and velocity
+%%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
+%%!  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
 
 %!test % tests 2 agents with changing position
 %!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
