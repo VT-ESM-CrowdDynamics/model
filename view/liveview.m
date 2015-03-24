@@ -1,10 +1,10 @@
 % can only stream in data from stdin - file reading doesn't seem compelling
 % can take "arguments" by using matlab/octave argument to eval variable
 % assignments, like:
-% octave --eval 'frameskip=100;streamtest' < blah.tsv
+% octave --eval 'frameskip=100;liveview' < blah.tsv
 % or
-% matlab -r 'frameskip=100;streamtest' < blah.tsv
-% note : vagrant ssh -c "cd git/swarm/view;time head -n 40 game-day\ test2\,\ only\ labeled.tsv | octave --eval 'streamtest'"&time head -n 40 game-day\ test2\,\ only\ labeled.tsv | matlab -r 'streamtest'&
+% matlab -r 'frameskip=100;liveview' < blah.tsv
+% note : vagrant ssh -c "cd git/swarm/view;time head -n 40 game-day\ test2\,\ only\ labeled.tsv | octave --eval 'liveview'"&time head -n 40 game-day\ test2\,\ only\ labeled.tsv | matlab -r 'liveview'&
 
 % TODO: add "argument" for headerless file
 % TODO: add file reading switch because debugging streaming sucks
@@ -35,7 +35,7 @@
 % end
 
 
-% defaults
+% defaults/options
 
 % profiling
 if ~exist('profiling_enabled', 'var')
@@ -51,7 +51,17 @@ if profiling_enabled
 	profile on;
 end
 
-for a = 1:12
+if ~exist('headerlines', 'var')
+	headerlines = 12;
+end
+
+% 2 for 2d, 3 for 3d (default)
+if ~exist('columnskip', 'var')
+	columnskip = 3;
+end
+
+% skip header
+for a = 1:headerlines
 	input('','s');
 end
 hold on
@@ -59,7 +69,7 @@ axis([-10000 10000 -10000 10000])
 line = input('', 's');
 % file = fopen('game-day test2, only labeled, first 50.tsv')
 % line = fgetl(file);
-% for a = 1:12
+% for a = 1:headerlines
 %     fgetl(file);
 % end
 frame = 0;
@@ -67,15 +77,15 @@ while ~(strcmpi(line,''))
 	frame = frame + 1;
 	% disp('main loop')
 	% disp(fields(1:2))
-	if true % ~(mod(frame, frameskip + 1) == 0)
+	if (mod(frame, frameskip + 1) == 0)
 		fields = strsplit(line,'\t','CollapseDelimiters',false);
 		% next line only good if frame/time was exported from QTM
 		fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})
 
 		% start columns need to reflect time/frame output
 		% skip value needs to reflect presence of z measurements
-		Xcoords = str2double(fields(3:3:end));
-		Ycoords = str2double(fields(4:3:end));
+		Xcoords = str2double(fields(3:columnskip:end));
+		Ycoords = str2double(fields(4:columnskip:end));
 		% Xcoords = str2double(fields(1:3:end));
 		% Ycoords = str2double(fields(2:3:end));
 
