@@ -154,7 +154,7 @@ function current_frame = timestep(buffer_zero)
         for wall = 1:5 %configuration.walls
           ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, wallPoints(wall*2 - 1), wallPoints(wall*2));
 
-        % end
+        end
         % iterate over each goal
         disp("GOALS");
         agentStruct(agent).goalNum
@@ -228,21 +228,21 @@ end
 %%!  init ( struct("dt", 1, "frames", 4, "agents", 2, "goal", 2) )
 %%!  assert ( looptest, [1 0 0 0 0 0; 2 1 50 50 50 50; 3 2 105 105 105 105; 4 3 165 165 165 165]  )
 
-%!test % tests 2 agents with changing position
-%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
-%!  assert ( looptest, [1 0 0 0 0 0; 2 2 100 100 100 100; 3 4 200 200 200 200] )
+%%!test % tests 2 agents with changing position
+%%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal", 1) )
+%%!  assert ( looptest, [1 0 0 0 0 0; 2 2 100 100 100 100; 3 4 200 200 200 200] )
 
-%!test % tests 2 agents
-%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal",0) )
-%!  assert ( looptest, [1 0 0 0 0 0; 2 2 0 0 0 0; 3 4 0 0 0 0] )
+%%!test % tests 2 agents
+%%!  init ( struct("dt", 2, "frames", 3, "agents", 2, "goal",0) )
+%%!  assert ( looptest, [1 0 0 0 0 0; 2 2 0 0 0 0; 3 4 0 0 0 0] )
 
-%!test
-%!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
-%!  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
+%%!test
+%%!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
+%%!  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
 
-%!test % add agents
-%!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
-%!  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
+%%!test % add agents
+%%!  init ( struct("dt", 2, "frames", 3, "agents", 1, "goal",0) )
+%%!  assert ( looptest, [1 0 0 0; 2 2 0 0; 3 4 0 0] )
 
 %!test % move to three frames
 %!  init ( struct("dt", 2, "frames", 3, "goal",0) )
