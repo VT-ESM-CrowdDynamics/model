@@ -1,9 +1,7 @@
 % 1;
 
 function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
-	agentPosVector
-	goalPoint1
-	goalPoint2
+	
 	%vector from all point to agent
 	relative = agentPosVector - goalPoint1;
 	%vector representing line segment
@@ -24,36 +22,37 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2)
 		%beyond goalPoint1
 		distence1 = norm(agentPosVector-goalPoint1); %distence from goalPoint to person
 		if (distence1 > 100)	
-			direction = (agentPosVector - goalPoint1)/distence1
+			direction = (agentPosVector - goalPoint1)/distence1;
 			force = -250; 
 			forceFromGoal = force*direction;
 		else
 			%the person is at the goal!
+			disp("AT GOALLLLL")
 			
 		end
 	elseif (c2 <= c1)
 		%beyond goalPoint2
 		
-		distence2 = norm(agentPosVector-goalPoint2) %distence from goalPoint to person
+		distence2 = norm(agentPosVector-goalPoint2); %distence from goalPoint to person
 		if (distence2 > 100)	
-			direction = (agentPosVector - goalPoint1)/distence2
+			direction = (agentPosVector - goalPoint1)/distence2;
 			force = -250; 
 			forceFromGoal = force*direction;
 		else
 			%the person is at the goal!
-			
+			disp("AT GOALLLLL")
 		end
 	else 
 		d = c1/c2;
 		pb = goalPoint1 + d*lineVector; %point on line closest to person
-		distence3 = norm(agentPosVector-pb); %distence from wall to person
+		distence3 = norm(agentPosVector-pb) %distence from wall to person
 		if (distence3 > 100)	
-			direction = (agentPosVector - pb)/distence3
+			direction = (agentPosVector - pb)/distence3;
 			force = -250; 
 			forceFromGoal = force*direction;
 		else
 			%at the goal
-			
+			disp("AT GOALLLLL")
 		end
 		
 	end 

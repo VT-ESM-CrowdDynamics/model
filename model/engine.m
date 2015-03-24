@@ -1,6 +1,6 @@
 % octave --eval 'test engine.m' 2>&1 | grep -v /usr/share/octave/3.8.1
 % trick to allow multiple functions
-% 1;
+1;
 
 % TODO: refactor output generation to wrap a step function in a loop to generate
 %       tracks matrix for assertion to keep tests but be able to stream tsv out
@@ -71,6 +71,7 @@ function tracks = looptest
     agentStruct(agent).goalPath = thePath;
     agentStruct(agent).pathLength = size(thePath);
     agentStruct(agent).inModel = true;
+    agentStruct(agent).maxVel = 4.5;
   end
 
   for frame = 2 : configuration.frames
@@ -128,16 +129,22 @@ function tracks = looptest
 
         end
         % iterate over each goal
-        disp("GOALS");
+        % disp("GOALS");
         agentStruct(agent).goalNum
-        G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:)
-        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)])
-        while(norm(forceFromGoal) == 0 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
-          agentStruct(agent).goalNum++;
+       
+        G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:) %get the goal array
+        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]) % get goal force from function
+        % while the goal force is zero and there are more goals in the path calc a new force with the next goal
+        norm(forceFromGoal) 
+        agentStruct(agent).goalNum
+        agentStruct(agent).pathLength
+        while(norm(forceFromGoal) < 1 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
+        disp("in the goal loop")
+          agentStruct(agent).goalNum = agentStruct(agent).goalNum + 1;
           G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
           forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)]);
         end
-        if (norm(forceFromGoal) == 0)
+        if (norm(forceFromGoal) < 1)
           %remove agent they are at the final goal
           agentStruct(agent).inModel = false;
         end
@@ -165,7 +172,7 @@ function tracks = looptest
     if (configuration.goal == 3)
       for theAgent = 1:configuration.agents
         % disp(theAgent)
-
+        
         Force = [MainForceVector(theAgent * 2 - 1), MainForceVector(theAgent * 2)];
         % dummy variable for velocity below
         previousPos = agentStruct(theAgent).pos;
@@ -173,6 +180,15 @@ function tracks = looptest
         agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt;
         % calculate new velocity (current pos - previous pos) / t
         agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
+        %this movement exceeded the max allowed velocity
+        if (agentStruct(agent).velocity > agentStruct(agent).maxVel)
+        	% get direction of movement
+        	direction = agentStruct(agent).vel/norm(agentStruct(agent).vel);
+        	% set velocity in that direction to be max velocity
+        	agentStruct(agent).vel = agentStruct(agent).maxVel*direction;
+        	% calculate new position with max velocity
+        	agentStruct(agent).pos = previousPos + agentStruct(agent).vel*configuration.dt;
+        end
         % get position for file
         Xpos = agentStruct(theAgent).pos(1);
         Ypos = agentStruct(theAgent).pos(2);
@@ -189,8 +205,8 @@ end
 
 
 %!test % increment with some force and velocity
-%!  init ( struct("dt", 1, "frames", 30, "agents", 1, "goal", 3) )
-%!  disp(looptest/300)
+%!  init( struct("dt", 0.1, "frames", 60, "agents", 1, "goal", 3) )
+%!  disp(looptest)
 
 %!test % previous test, "move to three frames", but from JSON config
 %!  init ( 'testfiles/config_read_test.json' )

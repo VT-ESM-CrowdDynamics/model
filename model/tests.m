@@ -1,4 +1,4 @@
-clear; 
+clear;
 clc;
 test engine.m
 test wallForce.m
