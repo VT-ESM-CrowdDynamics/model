@@ -86,15 +86,20 @@ function tracks = looptest
 
   % disp('start tracks')
   tracks = buffer(1,:);
+  tsv_out(tracks);
   for frame = 2 : configuration.frames
     % disp('looping!')
     % disp(frame)
     % disp(buffer)
     current_frame = timestep(frame);
-    % disp(sprintf('%d\t', current_frame))
+    tsv_out(current_frame);
     tracks = [tracks; current_frame];
     % disp('-------')
   end
+end
+
+function tsv_out(frame)
+  disp(sprintf('%d\t', frame)(1:end-1))
 end
 
 function new_index = tminus(n, buffer_zero)
