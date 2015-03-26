@@ -13,7 +13,7 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 	length = norm(lineVector);
 	%dummy variables
 	force = 0;
-	forceMultiplyer = 3; %arbitrary const to balance
+	forceMultiplyer = 1; %arbitrary const to balance
 	forceFromWall = [0,0];
 	%prjectionMagnitude = 0;
 	%if (length > 0)
@@ -25,8 +25,8 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 		if (distence != 0)	
 			direction = (agentPosVector - wallPoint1)/distence;
 			if (distence <= 500)
-				force = 5/(distence/1000)^3;
-			elseif (distence <=1250)
+				force = 4/(distence/1000)^3;
+			elseif (distence <=1200)
 			
 				force = 2/((distence-100)/1000)^3; 
 				 		
@@ -44,7 +44,7 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 			direction = (agentPosVector - wallPoint2)/distence;
 			if (distence <= 500)
 				force = 8/(distence/1000)^3;
-			elseif (distence <=1250)
+			elseif (distence <=1200)
 			
 				force = 2/((distence-100)/1000)^3; 
 				 		
@@ -55,17 +55,23 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 			
 		end
 	else 
+		%disp("in wall")
+		%wallPoint1
+		%wallPoint2
+		%agentPosVector
 		%closer
 		%the distence matters here
 		d = c1/c2;
 		pb = wallPoint1 + d*lineVector; %point on line closest to person
 		distence = norm(agentPosVector-pb); %distence from wall to person
 		if (distence != 0)	
-			direction = (agentPosVector - wallPoint1)/distence;
+			%disp("distence isnt zero")
+			direction = (agentPosVector - pb)/distence;
 			if (distence <= 500)
+				%disp("aa")
 				force = 8/(distence/1000)^3;
-			elseif (distence <=1250)
-			
+			elseif (distence <=1200)
+				%disp("bb")
 				force = 4/((distence-100)/1000)^3; %max around 900
 				 		
 			end

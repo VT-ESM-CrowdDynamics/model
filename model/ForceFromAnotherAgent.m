@@ -27,9 +27,9 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
     %force should be "infinite" bc agents cannot move closer 
     % should we output # of collisions for user data?
     if (distence < 200 ) % if two points are exactly on top it breaks... this should never happen but
-      ForceVector = [(rand - 0.5)*1000, (rand - 0.5)*1000];
+      ForceVector = [(rand - 0.5)*3000, (rand - 0.5)*3000];
     else 
-      ForceVector = relativePosOfOther*1000/distence;
+      ForceVector = relativePosOfOther*10000/distence;
     end
   
   % probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
