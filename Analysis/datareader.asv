@@ -101,10 +101,10 @@ IPstd=zeros(timespan, nummarker); % This array stores all the Std values for the
 Closest=zeros(timespan,nummarker);
 for a=1:timespan
     for b=1:nummarker
-        alldist=NaN(nummarker,1);
         if marker(b,a,1)==0.0 && marker(b,a,2)==0.0;
             
         else
+        alldist=NaN(nummarker,1);
         posx=marker(b,a,1); % X-position of marker in q.
         posy=marker(b,a,2); % Y-Position of marker in q.
         for c=1:nummarker
@@ -117,12 +117,12 @@ for a=1:timespan
             end
         end
         alldist=sort(alldist);
-        end
         avedist=(alldist(1)+alldist(2)+alldist(3)+alldist(4)+alldist(5))/5; % This is the average distance between our marker and the closest 5 markers.
         avestd=std(alldist(1:5)); % This is the stand. Dev. between the above markers.
         IPdistance(a, b)=avedist;
         IPstd(a,b)=avestd;
         Closest(a,b)=alldist(1);
+        end
     end
 end
 toc
