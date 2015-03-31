@@ -7,7 +7,10 @@ function current_frame = model_timestep(frame)
 
   for theAgent = 1:configuration.agents
     this_delta = zeros(1,2);
-    for 
+    for function_number = 1:size(configuration.functions)
+      this_delta = this_delta + configuration.functions{function_number}(theAgent,frame);
+    end
+
     delta(theAgent:1+theAgent) = this_delta;
   end
 
