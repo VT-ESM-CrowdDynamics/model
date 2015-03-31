@@ -45,7 +45,9 @@ for t=1:timespan
     grp1=0;grp2=0;grp3=0;grp4=0;grp5=0;
     
     for h=1:nummarker      %column 1 is x coord, and 2 is the y coord
-        
+        % The numbers in the elseif statements below refer to the x,y
+        % positions of the sections we have defined. See paper for more
+        % details. 
         if marker(h,t,1)==0.0 && marker(h,t,2)==0.0;
             
             
@@ -92,9 +94,9 @@ for t=1:timespan
 end
 
 % Interpersonal Distance
-% The goal of this function is to sweep out a radius and calculate the
-% average distance to the subject marker from all the other markers within
-% the swept radius. 
+% The goal of this function is to determine the five closest markers and
+% then determine the average distance from our goal marker to its 5 nearest
+% friends. 
 
 IPdistance=zeros(timespan, nummarker); % This array stores the interpersonal distance for each marker at each point in time.
 IPstd=zeros(timespan, nummarker); % This array stores all the Std values for the interpersonal distance.
@@ -125,4 +127,56 @@ for a=1:timespan
         Closest(a,b)=alldist(1);
     end
 end
+
+% Flux
+% This function will calculate the flux of people across a pre-determined
+% boundary. 
+interval=floor(timespan/120); %this way we get the flux per second, recording at 120 fps.
+Fluxarray=zeros(interval,3,3); % The columns are flux lines; the trays are pos, neg, gross. 
+% The X_i and Y_i below are the established flux boundaries. See paper for
+% greater detail. 
+X_i=-2722;
+Y_ii=3786.5;
+X_iii=2754;
+
+parfor tt=0:interval-1
+   posflux_i=0;
+   negflux_i=0;
+   posflux_ii=0;
+   negflux_ii=0;
+   posflux_iii=0;
+   negflux_iii=0;
+   t1=tt*120+1;
+   t2=(tt+1)*120+1;
+   for C=1:nummarker
+   
+   if marker(C,t1,1)==0.0 || marker(C,t2,1)==0.0
+       
+   elseif marker(C,t1,2)< 978 && marker(C,t1,2)> -1460
+       
+      if marker(C, t1, 1) < X_i && X_i < marker(C, t2,1)
+       posflux_i=posflux_i+1;
+      elseif marker(C, t1, 1) > X_i && X_i > marker(C, t2,1)
+       negflux_i=negflux_i+1;
+      elseif marker(C, t2, 1) < X_iii && X_iii < marker(C, t1,1)
+       posflux_iii=posflux_iii+1;
+      elseif marker(C, t2, 1) > X_iii && X_iii > marker(C, t1,1)
+       negflux_iii=negflux_iii+1;
+      end
+      
+    
+   elseif marker(C,t1,1) > -1235 && marker(C,t1,1)< 1334
+       if marker(C,t2,2)< Y_ii && marker(C, t1, 2) > Y_ii
+           posflux_ii=posflux_ii+1;
+       elseif marker(C,t2,2)> Y_ii && marker(C, t1, 2) < Y_ii
+           negflux_ii=negflux_ii+1;
+       end
+   end
+   end
+   Fluxarray(tt+1,:,:)=[posflux_i, negflux_i, posflux_i+negflux_i;...
+       posflux_ii, negflux_ii, posflux_ii+negflux_ii;...
+       posflux_iii, negflux_iii, posflux_iii+negflux_iii];
+       
+end
+
 toc
