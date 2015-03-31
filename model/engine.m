@@ -50,11 +50,13 @@ function tracks = looptest
   % array of spawns like goals
   spawnArray = [[-4,-20,4,-20];[-14,0,-14,8];[14,0,14,8]]*300;
   % setup needs to place agents in model and give properties etc
-  for agent = 1:configuration.agents
+  %x=configuration.initialAgents
+  for agent = 1 : 1%configuration.initialAgents
     % randomly spawn agents in spawn points
     % wont work right now bc all agents will spawn too close
     % need to populate hallways one by one
-    thisSpawn = randi([1 3])
+    %disp(agent)
+    thisSpawn = randi([1 3]);
     agentStruct(agent) = spawnDude(thisSpawn);
     %thisPath = randi([1 2])
     %spawn = spawnArray(thisSpawn,:); % get the random spawn line
@@ -101,7 +103,7 @@ end
 
 % pass in agentstruct? is deprecated - remove when possible
 function current_frame = timestep(buffer_zero)
-
+    
     global configuration;
     global buffer;
     global agentStruct;
@@ -116,28 +118,35 @@ function current_frame = timestep(buffer_zero)
     spawnRate2 = 1;
     spawnRate3 = 1;
     random = 0 + (1/configuration.dt - 1)*rand(3,1);
-    if (random(1) <= spawnRate1)
+    structSize = length((agentStruct));
+    %disp("aa")
+    if (random(1) <= spawnRate1 && structSize < configuration.agents)
       %spawn a dude at 1
-      % FAILS CURRENTLY CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      % need to add more to struct and or fill empty spots
-      agentStruct(agent) = spawnDude(1);
+      %disp("11111")
+      structSize = structSize+1;
+      agentStruct(structSize) = spawnDude(1);
+     
     end
-    if (random(2) <= spawnRate2)
+    if (random(2) <= spawnRate2 && structSize < configuration.agents)
       %spawn a dude at 2
-      agentStruct(agent) = spawnDude(2);
+      %disp("2222222")
+      structSize = structSize+1;
+      agentStruct(structSize) = spawnDude(2);
     end
-    if (random(3) <= spawnRate3)
+    if (random(3) <= spawnRate3 && structSize < configuration.agents)
       %spawn a dude at 3
-      agentStruct(agent) = spawnDude(3);
+      %disp("3333333")
+      structSize = structSize+1;
+      agentStruct(structSize) = spawnDude(3);
     end
-    
+    %disp("PAST");
     % disp(configuration);
 
     % build current_frame to have frame # and time
     current_frame = [buffer(tminus(1, buffer_zero), 1) + 1, buffer(tminus(1, buffer_zero), 2) + configuration.dt];
     % for over each agent in the
     MainForceVector = zeros(1, configuration.agents * 2);
-    structSize = length((agentStruct));
+    %disp("AA");
     for agent = 1:structSize
     maxDistence = agentStruct(agent).maxVel*configuration.dt;
       % disp('agent')
@@ -171,16 +180,17 @@ function current_frame = timestep(buffer_zero)
       % NEW goal using vectors and actual force function for calculations
       if (agentStruct(agent).inModel)
         % initialise a force vector for the method return
+        %disp("BB");
         ForceVector = [0, 0];
         ForceVector = ForceVector + frictionForce(agentStruct(agent).vel);
         % itterate over each other agent
-        for otherAgent = 1:configuration.agents
+        for otherAgent = 1:structSize
           if (otherAgent != agent && agentStruct(agent).inModel)
             % calculate the force vector, and add it to the current running force total
             ForceVector = ForceVector + ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
           end
         end
-        
+        %disp("CC");
         % iterate over each wall
         for wall = 1:5 %configuration.walls
           ForceVector = ForceVector + wallForce(agentStruct(agent).pos, agentStruct(agent).vel, wallPoints(wall*2 - 1,:), wallPoints(wall*2,:), maxDistence);
@@ -188,7 +198,7 @@ function current_frame = timestep(buffer_zero)
         end
         % iterate over each goal
         %disp("GOALS");
-        
+        %disp("DD");
         G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:); %get the goal array
         forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence); % get goal force from function
         % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
@@ -200,7 +210,9 @@ function current_frame = timestep(buffer_zero)
           G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
           forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence);
         end
+        %disp("EE");
         if (norm(forceFromGoal) < 1)
+        	%disp("REMOVE")
           %remove agent they are at the final goal
           agentStruct(agent).inModel = false;
         end
@@ -222,11 +234,14 @@ function current_frame = timestep(buffer_zero)
         % current_frame = [current_frame Xpos Ypos];
       end
     end
+    %disp("FF");
     % add in all the forces calculated before
     if (configuration.goal == 3)
+      
       for theAgent = 1:structSize
-        % disp(theAgent)
+        %disp(theAgent)
         if (agentStruct(theAgent).inModel)
+        	%disp("GG");
         	Force = [MainForceVector(theAgent * 2 - 1), MainForceVector(theAgent * 2)];
         	% dummy variable for velocity below
         	previousPos = agentStruct(theAgent).pos;
@@ -249,20 +264,29 @@ function current_frame = timestep(buffer_zero)
         	% update file
         	current_frame = [current_frame Xpos Ypos];
         	% update the array
+        	%disp("HH");
         else
+        	%disp("99");
+        	%disp(theAgent);
         	current_frame = [current_frame 99999 99999];
         end
         
       end
+      for needZeros = 1:(configuration.agents - structSize)
+        current_frame = [current_frame 99999 99999];
+      end
     end
+    %disp("II");
     buffer_slot = tminus(0, buffer_zero);
+    %disp("JJ");
     buffer(buffer_slot,:) = current_frame;
+    
     % disp('loop end')
 end
 
 
 %!test % increment with some force and velocity
-%!  init ( struct("dt", 0.1, "frames", 300, "agents", 2, "goal", 3) )
+%!  init ( struct("dt", 0.1, "frames", 300, "agents", 5, "goal", 3,"initialAgents","0") )
 %!  disp(looptest)
 
 %!test % previous test, "move to three frames", but from JSON config

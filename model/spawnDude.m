@@ -25,4 +25,5 @@ function anAgent = spawnDude(thisSpawn)
 	anAgent.pathLength = size(thePath)(2);
 	anAgent.inModel = true;
 	anAgent.maxVel = 4.5*300;
+	%disp(anAgent)
 end
