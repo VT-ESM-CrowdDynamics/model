@@ -139,7 +139,7 @@ X_i=-2722;
 Y_ii=3786.5;
 X_iii=2754;
 
-parfor tt=0:interval-1
+for tt=0:interval-1
    posflux_i=0;
    negflux_i=0;
    posflux_ii=0;
