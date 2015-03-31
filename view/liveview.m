@@ -60,12 +60,16 @@ if ~exist('columnskip', 'var')
 	columnskip = 3;
 end
 
+if ~exist('size', 'var')
+	size = 10000;
+end
+
 % skip header
 for a = 1:headerlines
 	input('','s');
 end
 hold on
-axis([-10000 10000 -10000 10000])
+axis([-size size -size size])
 line = input('', 's');
 % file = fopen('game-day test2, only labeled, first 50.tsv')
 % line = fgetl(file);
