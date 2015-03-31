@@ -114,9 +114,11 @@ function current_frame = timestep(buffer_zero)
     % disp("poop");
     extraStructSpots(1) = 0;
     %SPAWN DEM DUDES
+    %flux from each entrance per second
     spawnRate1 = 1;
     spawnRate2 = 1;
     spawnRate3 = 1;
+    % get an array of three random numbers [a, b, c] 
     random = 0 + (1/configuration.dt - 1)*rand(3,1);
     structSize = length((agentStruct));
     %disp("aa")
@@ -144,9 +146,10 @@ function current_frame = timestep(buffer_zero)
 
     % build current_frame to have frame # and time
     current_frame = [buffer(tminus(1, buffer_zero), 1) + 1, buffer(tminus(1, buffer_zero), 2) + configuration.dt];
-    % for over each agent in the
+    
     MainForceVector = zeros(1, configuration.agents * 2);
     %disp("AA");
+    % for over each agent in the model
     for agent = 1:structSize
     maxDistence = agentStruct(agent).maxVel*configuration.dt;
       % disp('agent')
@@ -183,6 +186,7 @@ function current_frame = timestep(buffer_zero)
         %disp("BB");
         ForceVector = [0, 0];
         ForceVector = ForceVector + frictionForce(agentStruct(agent).vel);
+        ForceVector = ForceVector + goRight(agentStruct(agent).vel)
         % itterate over each other agent
         for otherAgent = 1:structSize
           if (otherAgent != agent && agentStruct(agent).inModel)
@@ -204,6 +208,8 @@ function current_frame = timestep(buffer_zero)
         % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
         %disp(agentStruct(agent).goalNum)
         %agentStruct(agent).pos
+        % if the agent is close to a goal then make the next goal active
+        % the agent could possibly satisfy multiple goals at once -> while loop
         while(norm(forceFromGoal) < 1 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
         %disp("in the goal loop")
           agentStruct(agent).goalNum = agentStruct(agent).goalNum + 1;
@@ -240,8 +246,10 @@ function current_frame = timestep(buffer_zero)
       
       for theAgent = 1:structSize
         %disp(theAgent)
+        %is the agent still active and need forces?
         if (agentStruct(theAgent).inModel)
         	%disp("GG");
+        	%get this agents force
         	Force = [MainForceVector(theAgent * 2 - 1), MainForceVector(theAgent * 2)];
         	% dummy variable for velocity below
         	previousPos = agentStruct(theAgent).pos;
@@ -261,13 +269,14 @@ function current_frame = timestep(buffer_zero)
         	% get position for file
         	Xpos = agentStruct(theAgent).pos(1);
         	Ypos = agentStruct(theAgent).pos(2);
-        	% update file
+        	% update frame to put in file later
         	current_frame = [current_frame Xpos Ypos];
         	% update the array
         	%disp("HH");
         else
         	%disp("99");
         	%disp(theAgent);
+        	% the agent is no longer in the hallways, filler for output
         	current_frame = [current_frame 99999 99999];
         end
         
@@ -276,6 +285,7 @@ function current_frame = timestep(buffer_zero)
         current_frame = [current_frame 99999 99999];
       end
     end
+    %put frame in file
     %disp("II");
     buffer_slot = tminus(0, buffer_zero);
     %disp("JJ");
