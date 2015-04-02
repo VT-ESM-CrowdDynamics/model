@@ -97,7 +97,7 @@ parfor t=1:timespan
 % friends. 
 
         alldist=NaN(nummarker,1);
-        if isnan(marker(h,t,1));
+        if marker(h,t,1)==0.0 && marker(h,t,2)==0.0;
             
         else
         posx=marker(h,t,1); % X-position of marker in q.
@@ -160,7 +160,7 @@ for tt=0:interval-1
    t2=(tt+1)*120+1;
    for C=1:nummarker
    
-   if isnan(marker(C,t1,1))
+   if marker(C,t1,1)==0.0 || marker(C,t2,1)==0.0
        
    elseif marker(C,t1,2)< 978 && marker(C,t1,2)> -1460
        
