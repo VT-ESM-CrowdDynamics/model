@@ -25,10 +25,10 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 		if (distence != 0)	
 			direction = (agentPosVector - wallPoint1)/distence;
 			if (distence <= 500)
-				force = 4/(distence/1000)^3;
+				force = (1480 + 1000/((distence+200)/700)^2);
 			elseif (distence <=1200)
 			
-				force = 2/((distence-100)/1000)^3; 
+				force = 40/((distence-100)/1000)^3; 
 				 		
 			end
 			forceFromWall = force*direction*forceMultiplyer;
@@ -43,10 +43,10 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 		if (distence != 0)	
 			direction = (agentPosVector - wallPoint2)/distence;
 			if (distence <= 500)
-				force = 8/(distence/1000)^3;
+				force = (1480 + 1000/((distence+200)/700)^2);
 			elseif (distence <=1200)
 			
-				force = 2/((distence-100)/1000)^3; 
+				force = 40/((distence-100)/1000)^3; 
 				 		
 			end
 			forceFromWall = force*direction*forceMultiplyer;
@@ -69,10 +69,10 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 			direction = (agentPosVector - pb)/distence;
 			if (distence <= 500)
 				%disp("aa")
-				force = 8/(distence/1000)^3;
+				force = 2*(1480 + 1000/((distence+200)/700)^2);
 			elseif (distence <=1200)
 				%disp("bb")
-				force = 4/((distence-100)/1000)^3; %max around 900
+				force = 80/((distence-100)/1000)^3; %max around 900
 				 		
 			end
 			forceFromWall = force*direction*forceMultiplyer;
@@ -86,16 +86,16 @@ end
 
 
 
-%%!test % simple wall test
-%%!   disp(wallForce([-500,0],[0,0],[0,0],[0,5000]))
-%%! 
-%
-%%!test % simple wall test
-%%!   disp(wallForce([500,0],[0,0],[0,-5000],[0,5000]))
-%%! 
-%
-%%!test % simple wall test
-%%!   disp(wallForce([0,500],[0,0],[-5000,0],[5000,0]))
-%%!  
+%!test % simple wall test
+%!   disp(wallForce([-500,0],[0,0],[0,0],[0,5000]))
+%! 
+
+%!test % simple wall test
+%!   disp(wallForce([500,0],[0,0],[0,-5000],[0,5000]))
+%! 
+
+%!test % simple wall test
+%!   disp(wallForce([0,500],[0,0],[-5000,0],[5000,0]))
+%!  
 
 % test wallForce.m

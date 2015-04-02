@@ -1,5 +1,5 @@
 
 
 function friction = frictionForce(vel)
-  friction = -0.7*vel;
+  friction = -3*vel;
 end
