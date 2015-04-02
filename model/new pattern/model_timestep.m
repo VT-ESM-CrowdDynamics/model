@@ -1,18 +1,29 @@
 % must preload buffer with two frames
-function current_frame = model_timestep(frame)
+function current_frame = model_timestep()
+  global frame;
   global configuration;
   global buffer;
 
   delta = zeros(1,2*configuration.agents);
 
-  for theAgent = 1:configuration.agents
-    this_delta = zeros(1,2);
-    for function_number = 1:size(configuration.functions)
-      this_delta = this_delta + configuration.functions{function_number}(theAgent,frame);
-    end
+  % disp('update start')
 
-    delta(theAgent:1+theAgent) = this_delta;
+  switch configuration.parallel
+  case 'no'
+    for theAgent = 1:configuration.agents
+      delta(theAgent*2-1:theAgent*2) = agent_update(theAgent);
+      % delta
+    end
+  case 'matlab'
+    parfor theAgent = 1:configuration.agents
+      delta(theAgent*2-1:theAgent*2) = agent_update(theAgent);
+    end
+  case 'octave'
+    delta = pararrayfun(nproc(), @agent_update, 1:configuration.agents, 'VerboseLevel', 0);
+    % delta
   end
+
+  % disp('update done')
 
   % increment frame # and time for current_frame
   frame_time = [buffer(tminus(1, frame), 1) + 1, buffer(tminus(1, frame), 2) + configuration.dt];

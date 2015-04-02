@@ -13,12 +13,13 @@ function model_loop
   tsv_out(buffer(1,:));
   tsv_out(buffer(2,:));
 
+  global frame;
   % loop through requested frames
   for frame = 3 : configuration.frames
     % disp('looping!')
     % disp(frame)
     % disp(buffer)
-    current_frame = model_timestep(frame, buffer);
+    current_frame = model_timestep();
     buffer(tminus(0, frame),:) = current_frame;
     tsv_out(current_frame);
     % disp('-------')

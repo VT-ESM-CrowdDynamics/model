@@ -9,4 +9,7 @@ function model_init (config)
   end
   configuration = catstruct(defaults, config);
   % disp(configuration);
+  if strcmp(configuration.parallel, 'octave')
+    pkg load parallel
+  end
 end
