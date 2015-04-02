@@ -1,5 +1,5 @@
 clear all;
-%tic
+tic
 Data = dlmread('gamedaytest.tsv', '\t',12,1);
 [numrow,numcol] = size(Data);
 nummarker = (numcol-1) /3;
@@ -18,7 +18,6 @@ marker(marker==0)=NaN;
 
 numrow1=floor(numrow/5);
 velocity=zeros(numrow1,nummarker);
-fart=0;
 
 %Velocity
 for p=1:nummarker
@@ -26,7 +25,7 @@ for p=1:nummarker
         for j=10:5:numrow
 
           if any(isnan(marker(p,j-9:j,:)))
-       fart=fart+1;
+       
           else
               dx=marker(p,(j-9:j-1),1)-marker(p,(j-8:j),1);
               dy=marker(p,(j-9:j-1),2)-marker(p,(j-8:j),2);
@@ -44,7 +43,7 @@ crowddensity=zeros(timespan,5);
 IPdistance=NaN(timespan, nummarker); % This array stores the interpersonal distance for each marker at each point in time.
 IPstd=NaN(timespan, nummarker); % This array stores all the Std values for the interpersonal distance.
 Closest=NaN(timespan,nummarker);
-tic
+
 parfor t=1:timespan
     %This will count the number of markers in each group area at each point
     %in time.
@@ -103,19 +102,8 @@ parfor t=1:timespan
         posx=marker(h,t,1); % X-position of marker in q.
         posy=marker(h,t,2); % Y-Position of marker in q.
         
-        
+        %Compute all the distances
         alldist(:,1)=sqrt((posx-marker(:,t,1)).^2+(posy-marker(:,t,2)).^2);
-        
-%         for c=1:nummarker
-%             
-%             if marker(c,t,1)==0.0;
-%                 
-%             elseif c~=h
-%                 
-%                 alldist(c,1)=sqrt((posx-marker(c,t,1))^2+(posy-marker(c,t,2))^2);
-%             else
-%             end
-%         end
 
         alldist=sort(alldist);
         
@@ -135,7 +123,7 @@ parfor t=1:timespan
     crowddensity(t,:)=[grp1/6.9216, grp2/6.286, grp3/7.2138, grp4/7.212, grp5/7.2287]; %All the densities are measured in people/m^2
     
 end
-toc
+
 
 % Flux
 % This function will calculate the flux of people across a pre-determined
@@ -188,4 +176,4 @@ for tt=0:interval-1
        posflux_iii, negflux_iii, posflux_iii+negflux_iii];
        
 end
-%toc
+toc
