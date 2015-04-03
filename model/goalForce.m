@@ -13,7 +13,7 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2, maxDi
 	%length of line
 	length = norm(lineVector);
 	%dummy variables
-	force = -5000;
+	force = -4000;
 	forceFromGoal = [0,0];
 	%prjectionMagnitude = 0;
 	%if (length > 0)
@@ -61,7 +61,7 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2, maxDi
 		% hopefully this will prevent someone from going down a hallway on their right
 		% without it being a goal
 			if (norm(pb-goalPoint1) > 500 && norm(pb-goalPoint2) > 500)
-			forceFromGoal = forceFromGoal + goRight(agentVelVector);
+			forceFromGoal = forceFromGoal + goRight(-1*direction);
 			end
 		else
 			%at the goal

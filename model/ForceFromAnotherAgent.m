@@ -29,7 +29,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
     if (distence < 50 ) % if two points are exactly on top it breaks... this should never happen but
       ForceVector = [(rand - 0.5)*3000, (rand - 0.5)*3000];
     else 
-      ForceVector = relativePosOfOther*-1*(10000+1000/((distence+50)/550));
+      ForceVector = relativePosOfOther*-0.1*(10000+1000/((distence+50)/550));
     end
   
   % probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
@@ -40,7 +40,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
       % the repulsion zone
       % if forming a group this distence is too large probably 
       % this is less then a meter shoulder to shoulder
-      force = 1000/((distence+500)/2000)^3*0.7; %1000-8000
+      force = 1000/((distence+500)/2000)^3*0.05; %1000-8000
       ForceVector = force*relativePosOfOther*-1/distence;
       
       % something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
