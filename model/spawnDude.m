@@ -1,23 +1,24 @@
 
 function anAgent = spawnDude(thisSpawn)
 	
-	goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
-	spawnArray = [[-4,-20,4,-20];[-14,0,-14,8];[14,0,14,8]]*300;
+	goalPath = cat(3,[2,6,5;2,3,4],[3,6,5;3,2,1],[6,2,1;6,3,4]);
+	spawnArray = [[-4165,-1460,-4165,978];[4217,978,4217,-1460];[-1280,6822,1280, 6822,]];
 	
 	thisPath = randi([1 2]);
 	spawn = spawnArray(thisSpawn,:); % get the random spawn line
 	thePath = goalPath(thisPath,:,thisSpawn); % get the random path 
+	offset = 410;
 	if (spawn(1) > spawn(3))
-  	positionX = randi([(spawn(3)+200) (spawn(1)-200)]);
+  	positionX = randi([(spawn(3)+offset+1000) (spawn(1)-offset)]);
 	elseif (spawn(1) < spawn(3))
-  	positionX = randi([(spawn(1)+200) (spawn(3)-200)]);
+  	positionX = randi([(spawn(1)+offset+1000) (spawn(3)-offset)]);
   	else
   	positionX = spawn(1);
 	end
 	if (spawn(2) > spawn(4))
-  	positionY = randi([(spawn(4)+200) (spawn(2)-200)]);
+  	positionY = randi([(spawn(4)+offset+1000) (spawn(2)-offset)]);
 	elseif(spawn(4) > spawn(2))
-  	positionY = randi([(spawn(2)+200) (spawn(4)-200)]);
+  	positionY = randi([(spawn(2)+offset+1000) (spawn(4)-offset)]);
   	else 
   	positionY = spawn(2);
 	end
@@ -29,5 +30,6 @@ function anAgent = spawnDude(thisSpawn)
 	anAgent.pathLength = size(thePath)(2);
 	anAgent.inModel = true;
 	anAgent.maxVel = 4.0*300 + randi([0 240]);
+	anAgent.goalDirection = [0,0];
 	%disp(anAgent)
 end

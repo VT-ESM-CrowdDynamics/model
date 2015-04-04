@@ -39,18 +39,20 @@ function tracks = looptest
   % array of wall points
   % needs to be configured from the starting file
   % 1ft = 304.8mm (300)
-  wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
+  wallPoints = [[-4165,-1460];[4217,-1460];[-4165,978];[-1280,978];[1280,978];[4217,978];[-491,6823];[-1280,978];[1280,978];[1280,6823]]; % T
   % array of goals [x1,y1,x2,y2] for each goal
-  goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
+  offset = 0;
+  %goRight = 4;
+  goalArray = [[-4165,-1460,-4165,978];[-1280,978,-1280,-1460];[1280,978,1280,-1460];[4217,978,4217,-1460];[-1280,6822,1280, 6822,];[-1280,978,1280,978]]; % lines across halls in T
   % array of possible paths from goal to goal, path# assigned randomly to each agent
   % for example in T intersection can have two path# each to one exit
   % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call configuration.goalArray(2) then configuration.goalArray(5)
   % as the agent moves from goal to goal
-  goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
+  goalPath = cat(3,[2,6,5;2,3,4],[3,6,5;3,2,1],[6,2,1;6,3,4]);
   paths = 2; % # of possible paths for each spawn
   spawns = 3; % # possible spawns
   % array of spawns like goals
-  spawnArray = [[-4,-20,4,-20];[-14,0,-14,8];[14,0,14,8]]*300;
+  spawnArray = [[-4165,-1460,-4165,978];[4217,978,4217,-1460];[-1280,6822,1280, 6822,]];
   % setup needs to place agents in model and give properties etc
   %x=configuration.initialAgents
   for agent = 1 : 1%configuration.initialAgents
@@ -193,19 +195,12 @@ function current_frame = timestep(buffer_zero)
         % initialise a force vector for the method return
         %disp("BB");
         ForceVector = [0, 0];
-        ForceVector = ForceVector + frictionForce(agentStruct(agent).vel);
-        ForceVector = ForceVector + 100*(-0.5 + rand(1,2));
+        ForceVector = ForceVector + frictionForce(agentStruct(agent).vel); %- goRight(agentStruct(agent).vel);
+        ForceVector = ForceVector + 0*(-0.5 + rand(1,2));
         %included in goal force for reasons
         %ForceVector = ForceVector + goRight(agentStruct(agent).vel);
         % itterate over each other agent
-        for otherAgent = 1:structSize
-          if (otherAgent != agent && agentStruct(agent).inModel)
-            % calculate the force vector, and add it to the current running force total
-            Force = ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel);
-            ForceVector = ForceVector + Force;
-            %fprintf(fileID,'Agent: %3.0f from agent: %3.0f -> x is %8.0f , y is %8.0f\n', agent, otherAgent, Force);
-          end
-        end
+       
         %disp("CC");
         % iterate over each wall
         for wall = 1:5 %configuration.walls
@@ -217,7 +212,9 @@ function current_frame = timestep(buffer_zero)
         %disp("GOALS");
         %disp("DD");
         G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:); %get the goal array
-        forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence, agentStruct(agent).vel); % get goal force from function
+        [forceFromGoal, goRightForce] = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence, agentStruct(agent).vel);
+        
+        % get goal force from function
         %fprintf(fileID,'Agent: %3.0f forceGoal1 -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
         % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
         %disp(agentStruct(agent).goalNum)
@@ -226,24 +223,36 @@ function current_frame = timestep(buffer_zero)
         % the agent could possibly satisfy multiple goals at once -> while loop
         while(norm(forceFromGoal) < 1 && agentStruct(agent).goalNum < agentStruct(agent).pathLength)
         %disp("in the goal loop")
-        fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> # %5.0f\n', agent, agentStruct(agent).goalNum );
+        %fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> # %5.0f\n', agent, agentStruct(agent).goalNum );
           agentStruct(agent).goalNum = agentStruct(agent).goalNum + 1;
           G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
-          fprintf(fileID,'Agent:%2.0f G = %4.0f %4.0f %4.0f %4.0f\n', agent, G );
-          forceFromGoal = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence, agentStruct(agent).vel);
-          fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> x %5.0f , y %5.0f\n , norm =%5.0f\n', agent, forceFromGoal, norm(forceFromGoal));
+         % fprintf(fileID,'Agent:%2.0f G = %4.0f %4.0f %4.0f %4.0f\n', agent, G );
+          [forceFromGoal, goRightForce] = goalForce(agentStruct(agent).pos, [G(1),G(2)],[G(3),G(4)], maxDistence, agentStruct(agent).vel);
+          %fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> x %5.0f , y %5.0f\n , norm =%5.0f\n', agent, forceFromGoal, norm(forceFromGoal));
         end
         %disp("EE");
         if (norm(forceFromGoal) < 1)
         	%disp("REMOVE")
           %remove agent they are at the final goal
           agentStruct(agent).inModel = false;
-          fprintf(fileID,'Agent:%2.0f REMOVED!! -> x%5.0f , y%5.0f\n , norm =%5.0f\n', agent, forceFromGoal, norm(forceFromGoal));
+          %fprintf(fileID,'Agent:%2.0f REMOVED!! -> x%5.0f , y%5.0f\n , norm =%5.0f\n', agent, forceFromGoal, norm(forceFromGoal));
+        else
+        ForceVector = ForceVector + forceFromGoal + goRightForce; 
+         for otherAgent = 1:structSize
+          if (otherAgent != agent && agentStruct(agent).inModel)
+            % calculate the force vector, and add it to the current running force total
+            Force = ForceFromAnotherAgent(agentStruct(agent).pos, agentStruct(agent).vel, agentStruct(otherAgent).pos, agentStruct(otherAgent).vel, forceFromGoal);
+            ForceVector = ForceVector + Force;
+            %fprintf(fileID,'Agent: %3.0f from agent: %3.0f -> x is %8.0f , y is %8.0f\n', agent, otherAgent, Force);
+          end
         end
-        ForceVector = ForceVector + forceFromGoal; 
+        agentStruct(agent).goalDirection = forceFromGoal/norm(forceFromGoal);
+        end
+        
         %fprintf(fileID,'Agent: %3.0f forceGoalAPPLIED -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
-        MainForceVector(agent * 2 - 1) = ForceVector(1);
-        MainForceVector(agent * 2) = ForceVector(2);
+        mult = 0.1;
+        MainForceVector(agent * 2 - 1) = ForceVector(1)*mult;
+        MainForceVector(agent * 2) = ForceVector(2)*mult;
 
         % dummy variable for velocity below
         % previousPos = agentStruct(agent).pos
@@ -276,7 +285,18 @@ function current_frame = timestep(buffer_zero)
         	agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt;
         	% calculate new velocity (current pos - previous pos) / t
         	agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
+        	direction = agentStruct(theAgent).vel/norm(agentStruct(theAgent).vel);
+        	Xpos = agentStruct(theAgent).pos(1);
+        	Ypos = agentStruct(theAgent).pos(2);
+        	if(sign(agentStruct(theAgent).goalDirection(1)) != 0 && sign(agentStruct(theAgent).goalDirection(1)) != sign(direction(1)))
+        	  Xpos = previousPos(1);
         	
+        	end
+        	if(sign(agentStruct(theAgent).goalDirection(2)) != 0 && sign(agentStruct(theAgent).goalDirection(2)) != sign(direction(2)))
+        	  Ypos = previousPos(2);
+        	
+        	end
+        	agentStruct(theAgent).pos = [Xpos Ypos];
         	%disp(agentStruct(theAgent).vel)
         	%this movement exceeded the max allowed velocity
         	if (norm(agentStruct(theAgent).vel) > agentStruct(theAgent).maxVel)
@@ -289,10 +309,10 @@ function current_frame = timestep(buffer_zero)
         		agentStruct(theAgent).pos = previousPos + agentStruct(theAgent).vel*configuration.dt;
         		%disp(previousPos);
         		%disp(agentStruct(theAgent).pos);
+        		Xpos = agentStruct(theAgent).pos(1);
+        	  Ypos = agentStruct(theAgent).pos(2);
         	end
-        	% get position for file
-        	Xpos = agentStruct(theAgent).pos(1);
-        	Ypos = agentStruct(theAgent).pos(2);
+        	
         	% update frame to put in file later
         	current_frame = [current_frame Xpos Ypos];
         	% update the array
@@ -321,7 +341,7 @@ end
 
 
 %!test % increment with some force and velocity
-%!  init ( struct("dt", 0.1, "frames", 20, "agents", 2, "goal", 3,"initialAgents","0") )
+%!  init ( struct("dt", 0.1, "frames", 100, "agents", 3, "goal", 3,"initialAgents","0") )
 %!  disp(looptest)
 
 %!test % previous test, "move to three frames", but from JSON config

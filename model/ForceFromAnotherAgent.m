@@ -3,7 +3,7 @@
 
 % do we want equal and opposite forces?
 % line of sight, sweep out an arc would be ideal...
-function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, OtherPosVector, VelOther)
+function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, OtherPosVector, VelOther, forceFromGoal)
   % lets assume distances are calculated in mm
   % a person is about... 500mm wide (so radius is 250mm)
   %disp('in force function')
@@ -15,10 +15,16 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
   % we may want to specify persons size in the config files? (ie let user change it)
   % maybe each agent has a diff number here in if statement for size 
   angleOfSight = 1;
+  %1 for right, -1 for left
+  
+  theSign = sign(cross([forceFromGoal(1), forceFromGoal(2) ,0], [relativePosOfOther, 0]));
+  if (theSign == 0)
+    theSign = [0,0,-1];
+  end
   if (norm(AgentVelVector) > 0)
     % calculate angle between vel and other's pos, assume agent is looking in direction of velocity 
     % line of sight
-  angleOfSignt = dot(AgentVelVector,OtherPosVector)/norm(AgentVelVector)/norm(OtherPosVector);
+  angleOfSignt = dot(forceFromGoal,OtherPosVector)/norm(forceFromGoal)/norm(OtherPosVector);
   end
   
   if (distence <= 500)
@@ -29,19 +35,19 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
     if (distence < 50 ) % if two points are exactly on top it breaks... this should never happen but
       ForceVector = [(rand - 0.5)*3000, (rand - 0.5)*3000];
     else 
-      ForceVector = relativePosOfOther*-0.1*(10000+1000/((distence+50)/550));
+      ForceVector = relativePosOfOther*-0.05*(10000+1/((distence+50)))  +1*goRight(theSign(3)*forceFromGoal);
     end
   
   % probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
   % should groups be handled in this function or another function designed spcifically for groups?
   elseif (angleOfSight > 0) % person has 180 view
-    if (distence <= 1500)
+    if (distence <= 2000)
       %disp('repel')
       % the repulsion zone
       % if forming a group this distence is too large probably 
       % this is less then a meter shoulder to shoulder
       force = 1000/((distence+500)/2000)^3*0.05; %1000-8000
-      ForceVector = force*relativePosOfOther*-1/distence;
+      ForceVector = force*relativePosOfOther*-1/distence +1*goRight(theSign(3)*forceFromGoal);
       
       % something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
       % determine probability of wanting to 'dodge' right or left (culture) (should user set this?)
@@ -51,7 +57,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
       %potentially form group? 
       if (norm(VelOther) > 0.1)
         
-        ForceVector = 20*VelOther/norm(VelOther);
+        ForceVector = 5*VelOther/norm(VelOther);
       else 
         ForceVector = [0,0];
       end
