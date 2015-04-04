@@ -53,11 +53,6 @@ function tsv_out(frame)
   disp(sprintf('%d\t', frame)(1:end-1))
 end
 
-function new_index = tminus(n, buffer_zero)
-  global configuration;
-  new_index = mod(buffer_zero - n - 1, configuration.buffer_size) + 1;
-end
-
 % pass in agentstruct? is deprecated - remove when possible
 function current_frame = timestep(buffer_zero)
     global fileID;
