@@ -82,6 +82,9 @@ while ~(strcmpi(line,''))
 	% disp('main loop')
 	% disp(fields(1:2))
 	if (mod(frame, frameskip + 1) == 0)
+		if ~isstrprop(line(1), 'digit')
+			continue
+		end
 		fields = strsplit(line,'\t','CollapseDelimiters',false);
 		% next line only good if frame/time was exported from QTM
 		fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})

@@ -25,8 +25,14 @@ function current_frame = model_timestep()
 
   % disp('update done')
 
-  % increment frame # and time for current_frame
+  % increment frame # and time for current_frame for "header"
   frame_time = [buffer(tminus(1, frame), 1) + 1, buffer(tminus(1, frame), 2) + configuration.dt];
+
+  % update auxiliary data structures
+
+
+
+
   current_frame = [frame_time, delta];
   % disp('loop end')
 end
