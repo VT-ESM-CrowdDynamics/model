@@ -53,7 +53,6 @@ function tsv_out(frame)
   disp(sprintf('%d\t', frame)(1:end-1))
 end
 
-% pass in agentstruct? is deprecated - remove when possible
 function current_frame = timestep(buffer_zero)
     global fileID;
     global configuration;
@@ -61,40 +60,7 @@ function current_frame = timestep(buffer_zero)
     global agentStruct;
     global wallPoints;
     global goalArray;
-    % TODO: change to timestep
-    % if configuration.frames == 2
-    % disp("poop");
-    extraStructSpots(1) = 0;
-    %SPAWN DEM DUDES
-    %flux from each entrance per second
-    spawnRate1 = 1;
-    spawnRate2 = 1;
-    spawnRate3 = 1;
-    % get an array of three random numbers [a, b, c] 
-    random = 0 + (1/configuration.dt)*rand(3,1);
-    structSize = length((agentStruct));
-    %disp("aa")
-    if (random(1) <= spawnRate1 && structSize < configuration.agents)
-      %spawn a dude at 1
-      %disp("11111")
-      structSize = structSize+1;
-      agentStruct(structSize) = spawnDude(1);
-     
-    end
-    if (random(2) <= spawnRate2 && structSize < configuration.agents)
-      %spawn a dude at 2
-      %disp("2222222")
-      structSize = structSize+1;
-      agentStruct(structSize) = spawnDude(2);
-    end
-    if (random(3) <= spawnRate3 && structSize < configuration.agents)
-      %spawn a dude at 3
-      %disp("3333333")
-      structSize = structSize+1;
-      agentStruct(structSize) = spawnDude(3);
-    end
-    %disp("PAST");
-    % disp(configuration);
+    spawn();
 
     % build current_frame to have frame # and time
     current_frame = [buffer(tminus(1, buffer_zero), 1) + 1, buffer(tminus(1, buffer_zero), 2) + configuration.dt];
@@ -102,6 +68,7 @@ function current_frame = timestep(buffer_zero)
     MainForceVector = zeros(1, configuration.agents * 2);
     %disp("AA");
     % for over each agent in the model
+    structSize = length((agentStruct));
     for agent = 1:structSize
     maxDistence = agentStruct(agent).maxVel*configuration.dt;
       % disp('agent')
