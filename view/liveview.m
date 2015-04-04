@@ -113,10 +113,7 @@ while ~(strcmpi(line,''))
 		last = plot(Xcoords, Ycoords, 'linestyle', 'none', 'marker', '.');
 		drawnow;
 	end
-	line = 'parcellfun'
-	while strfind(line, 'parcellfun')
-		line = input('', 's');
-	end
+	line = input('', 's');
 	% line = fgetl(file);
 end
 if exist('last', 'var')

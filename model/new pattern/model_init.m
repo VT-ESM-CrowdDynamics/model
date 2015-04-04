@@ -9,7 +9,9 @@ function model_init (config)
   end
   configuration = catstruct(defaults, config);
   % disp(configuration);
-  if strcmp(configuration.parallel, 'octave')
+  if exist('OCTAVE_VERSION') ~= 0  
+    % you'll need to run this once, to install the package:
+    % pkg install -forge parallel
     pkg load parallel
   end
 end
