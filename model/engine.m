@@ -70,35 +70,10 @@ function current_frame = timestep(buffer_zero)
     % for over each agent in the model
     structSize = length((agentStruct));
     for agent = 1:structSize
-    maxDistence = agentStruct(agent).maxVel*configuration.dt;
+      maxDistence = agentStruct(agent).maxVel*configuration.dt;
       % disp('agent')
       % disp(agent)
       currentAgentFileSpot = agent * 2;
-      %if (configuration.goal == 1)
-        %Xpos = buffer(tminus(1, buffer_zero), agent + 2) + 100;
-        %Ypos = buffer(tminus(1, buffer_zero), agent + 3) + 100;
-        %current_frame = [current_frame Xpos Ypos];
-      %elseif (configuration.goal == 2)
-        %if (buffer(tminus(1, buffer_zero), 1) == NaN)
-%
-          %InitialXvelocity = 50;
-          %InitialYvelocity = 50;
-          %Xforce = 0;
-          %Yforce = 0;
-%
-          %Xpos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) + Xforce * (configuration.dt) ^ 2 + InitialXvelocity;
-          %Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + InitialYvelocity;
-          %current_frame = [current_frame Xpos Ypos];
-        %else
-          %% velocity is current position - last position / dt
-          %Xvel = (buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) - buffer(tminus(2, buffer_zero), currentAgentFileSpot + 1)) / configuration.dt;
-          %Yvel = (buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) - buffer(tminus(2, buffer_zero), currentAgentFileSpot + 2)) / configuration.dt;
-          %Xforce = 5;
-          %Yforce = 5;
-          %Xpos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 1) + Xforce * (configuration.dt) ^ 2 + Xvel;
-          %Ypos = buffer(tminus(1, buffer_zero), currentAgentFileSpot + 2) + Yforce * (configuration.dt) ^ 2 + Yvel;
-          %current_frame = [current_frame Xpos Ypos];
-        %end
       % Calculate all the forces
       if (agentStruct(agent).inModel)
         % initialise a force vector for the method return
@@ -156,71 +131,12 @@ function current_frame = timestep(buffer_zero)
         MainForceVector(agent * 2 - 1) = ForceVector(1);
         MainForceVector(agent * 2) = ForceVector(2);
 
-        % dummy variable for velocity below
-        % previousPos = agentStruct(agent).pos
-        % calculate the new position att + vt + x
-        % agentStruct(agent).pos = agentStruct(agent).pos + ForceVector*(configuration.dt)^2 + agentStruct(agent).vel*configuration.dt
-        % calculate new velocity (current pos - previous pos) / t
-        % agentStruct(agent).vel = (agentStruct(agent).pos - previousPos)/configuration.dt
-        % get position for file
-        % Xpos = agentStruct(agent).pos(1);
-        % Ypos = agentStruct(agent).pos(2);
-        % update file
-        % current_frame = [current_frame Xpos Ypos];
       end
     end
     %disp("FF");
-    % add in all the forces calculated before
-    if (configuration.goal == 3)
-      
-      for theAgent = 1:structSize
-        %theAgent
-        %is the agent still active and need forces?
-        if (agentStruct(theAgent).inModel)
-        	%disp("GG");
-        	%get this agents force
-        	Force = [MainForceVector(theAgent * 2 - 1), MainForceVector(theAgent * 2)];
-        	
-        	% dummy variable for velocity below
-        	previousPos = agentStruct(theAgent).pos;
-        	% calculate the new position att + vt + x
-        	agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt;
-        	% calculate new velocity (current pos - previous pos) / t
-        	agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
-        	
-        	%disp(agentStruct(theAgent).vel)
-        	%this movement exceeded the max allowed velocity
-        	if (norm(agentStruct(theAgent).vel) > agentStruct(theAgent).maxVel)
-        		%disp("adjust vel")
-        		% get direction of movement
-        		direction = agentStruct(theAgent).vel/norm(agentStruct(theAgent).vel);
-        		% set velocity in that direction to be max velocity
-        		agentStruct(theAgent).vel = agentStruct(theAgent).maxVel*direction;
-        		% calculate new position with max velocity
-        		agentStruct(theAgent).pos = previousPos + agentStruct(theAgent).vel*configuration.dt;
-        		%disp(previousPos);
-        		%disp(agentStruct(theAgent).pos);
-        	end
-        	% get position for file
-        	Xpos = agentStruct(theAgent).pos(1);
-        	Ypos = agentStruct(theAgent).pos(2);
-        	% update frame to put in file later
-        	current_frame = [current_frame Xpos Ypos];
-        	% update the array
-        	%disp("HH");
-        else
-        	%disp("99");
-        	%disp(theAgent);
-        	% the agent is no longer in the hallways, filler for output
-        	current_frame = [current_frame 9999 9999];
-        	agentStruct(theAgent).pos = [9999 9999];
-        end
-        
-      end
-      for needZeros = 1:(configuration.agents - structSize)
-        current_frame = [current_frame 9999 9999];
-      end
-    end
+
+    current_frame = goal_update(MainForceVector, current_frame);
+
     %put frame in file
     %disp("II");
     buffer_slot = tminus(0, buffer_zero);
