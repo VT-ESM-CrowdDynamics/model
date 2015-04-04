@@ -1,6 +1,12 @@
 clear all;
+[file,path,bool]=uigetfile('*.tsv', 'Select Data Set');
+if bool==0
+    msgbox(sprintf('Error'),'Error','Error');
+    return
+end
+
 tic
-Data = dlmread('gamedaytest.tsv', '\t',12,1);
+Data = dlmread(file, '\t',12,1);
 [numrow,numcol] = size(Data);
 nummarker = (numcol-1) /3;
 
@@ -128,7 +134,7 @@ end
 % Flux
 % This function will calculate the flux of people across a pre-determined
 % boundary. 
-interval=floor(timespan/120); %this way we get the flux per second, recording at 120 fps.
+interval=floor(timespan/60); %this way we get the flux per second, recording at 60 fps.
 Fluxarray=zeros(interval,3,3); % The columns are flux lines; the trays are pos, neg, gross. 
 % The X_i and Y_i below are the established flux boundaries. See paper for
 % greater detail. 
@@ -144,8 +150,8 @@ for tt=0:interval-1
    negflux_ii=0;
    posflux_iii=0;
    negflux_iii=0;
-   t1=tt*120+1;
-   t2=(tt+1)*120+1;
+   t1=tt*60+1;
+   t2=(tt+1)*60+1;
    for C=1:nummarker
    
    if isnan(marker(C,t1,1))
