@@ -7,13 +7,12 @@ end
 
 tic
 Data = dlmread(file, '\t',12,1);
-[numrow,numcol] = size(Data);
+[timespan,numcol] = size(Data);
 nummarker = (numcol-1) /3;
 
 time=Data(:,1);
-timespan=length(time);
-dt=time(10)-time(1);
-marker=zeros(nummarker,numrow,2); %3D array, first is marker number
+dt=time(60)-time(1);
+marker=zeros(nummarker,timespan,2); %3D array, first is marker number
 %Read in all the data from tsv file
 for i=1:nummarker
     marker(i,:,1:2)=Data(:,(3*i-1):(3*i));
@@ -22,21 +21,21 @@ end
 %replace any 0.0 value with NaN
 marker(marker==0)=NaN;
 
-numrow1=floor(numrow/5);
+numrow1=floor(timespan/30);
 velocity=zeros(numrow1,nummarker);
-
+% plottablevelocity=zeros(
 %Velocity
 for p=1:nummarker
     q=1;
-        for j=10:5:numrow
+        for j=60:30:timespan
 
-          if any(isnan(marker(p,j-9:j,:)))
+          if any(isnan(marker(p,j-59:j,:)))
        
           else
-              dx=marker(p,(j-9:j-1),1)-marker(p,(j-8:j),1);
-              dy=marker(p,(j-9:j-1),2)-marker(p,(j-8:j),2);
+              dx=marker(p,(j-59:j-1),1)-marker(p,(j-58:j),1);
+              dy=marker(p,(j-59:j-1),2)-marker(p,(j-58:j),2);
               distance=sqrt(dx.^2 + dy.^2);
-              velocity(q,p)=sum(distance)/dt;
+              velocity(q,p)=sum(distance)/(dt*1000);
           end
           q=q+1;
         end
@@ -119,8 +118,8 @@ parfor t=1:timespan
         for j=2:6
           sum=sum+(avedist-alldist(j))^2; 
         end; 
-        IPstd(t,h)=sqrt(sum/(j-2));
-        IPdistance(t,h)=avedist;
+        IPstd(t,h)=sqrt(sum/(j-2))/1000;
+        IPdistance(t,h)=avedist/1000;
         Closest(t,h)=alldist(1);
         end
         
@@ -135,7 +134,7 @@ end
 % This function will calculate the flux of people across a pre-determined
 % boundary. 
 interval=floor(timespan/60); %this way we get the flux per second, recording at 60 fps.
-Fluxarray=zeros(interval,3,3); % The columns are flux lines; the trays are pos, neg, gross. 
+Fluxarray=zeros(interval,3,3); % The columns are pos,neg,gross; the trays are flux lines. 
 % The X_i and Y_i below are the established flux boundaries. See paper for
 % greater detail. 
 X_i=-2722;
@@ -154,32 +153,35 @@ for tt=0:interval-1
    t2=(tt+1)*60+1;
    for C=1:nummarker
    
-   if isnan(marker(C,t1,1))
+     if isnan(marker(C,t1,1))
+     elseif isnan(marker(C,t2,1))
+     
+     elseif marker(C,t1,2)< 978 && marker(C,t1,2)> -1460
        
-   elseif marker(C,t1,2)< 978 && marker(C,t1,2)> -1460
-       
-      if marker(C, t1, 1) < X_i && X_i < marker(C, t2,1)
-       posflux_i=posflux_i+1;
-      elseif marker(C, t1, 1) > X_i && X_i > marker(C, t2,1)
-       negflux_i=negflux_i+1;
-      elseif marker(C, t2, 1) < X_iii && X_iii < marker(C, t1,1)
-       posflux_iii=posflux_iii+1;
-      elseif marker(C, t2, 1) > X_iii && X_iii > marker(C, t1,1)
-       negflux_iii=negflux_iii+1;
-      end
+       if marker(C, t1, 1) < X_i && X_i < marker(C, t2,1)
+           posflux_i=posflux_i+1;
+       elseif marker(C, t1, 1) > X_i && X_i > marker(C, t2,1)
+        negflux_i=negflux_i+1;
+       elseif marker(C, t2, 1) < X_iii && X_iii < marker(C, t1,1)
+         posflux_iii=posflux_iii+1;
+       elseif marker(C, t2, 1) > X_iii && X_iii > marker(C, t1,1)
+        negflux_iii=negflux_iii+1;
+       end
       
     
-   elseif marker(C,t1,1) > -1235 && marker(C,t1,1)< 1334
-       if marker(C,t2,2)< Y_ii && marker(C, t1, 2) > Y_ii
+     elseif marker(C,t1,1) > -1235 && marker(C,t1,1)< 1334
+         if marker(C,t2,2)< Y_ii && marker(C, t1, 2) > Y_ii
            posflux_ii=posflux_ii+1;
-       elseif marker(C,t2,2)> Y_ii && marker(C, t1, 2) < Y_ii
+         elseif marker(C,t2,2)> Y_ii && marker(C, t1, 2) < Y_ii
            negflux_ii=negflux_ii+1;
-       end
+         end
+         
+     end
+      
    end
-   end
-   Fluxarray(tt+1,:,:)=[posflux_i, negflux_i, posflux_i+negflux_i;...
-       posflux_ii, negflux_ii, posflux_ii+negflux_ii;...
-       posflux_iii, negflux_iii, posflux_iii+negflux_iii];
+   Fluxarray(tt+1,:,:)=[posflux_i, posflux_ii, posflux_iii;...
+       negflux_i, negflux_ii, negflux_iii;...
+       posflux_i+negflux_i, posflux_ii+negflux_ii, posflux_iii+negflux_iii];
        
 end
 toc
