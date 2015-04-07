@@ -65,7 +65,7 @@ for a = 1:headerlines
 	input('','s');
 end
 hold on
-axis([-10000 10000 -10000 10000])
+axis([-4165 4217 -1600 6823])
 line = input('', 's');
 % file = fopen('game-day test2, only labeled, first 50.tsv')
 % line = fgetl(file);
@@ -73,6 +73,10 @@ line = input('', 's');
 %     fgetl(file);
 % end
 frame = 0;
+wallPoints = [-4165 -1460 4217 -1460;-4165 978 -1280 978 ; 1280 978 4217 978; -1280 6823 -1280 978; 1280 978  1280 6823];
+x = [wallPoints(:,1) wallPoints(:,3)];
+y = [wallPoints(:,2) wallPoints(:,4)];
+plot(x', y','color',[0,0.7,0.9]);
 while ~(strcmpi(line,''))
 	frame = frame + 1;
 	% disp('main loop')
@@ -80,7 +84,7 @@ while ~(strcmpi(line,''))
 	if (mod(frame, frameskip + 1) == 0)
 		fields = strsplit(line,'\t','CollapseDelimiters',false);
 		% next line only good if frame/time was exported from QTM
-		fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})
+		%fprintf('Frame: %1s, Time: %2s\n', fields{1}, fields{2})
 
 		% start columns need to reflect time/frame output
 		% skip value needs to reflect presence of z measurements

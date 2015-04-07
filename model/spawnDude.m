@@ -9,16 +9,16 @@ function anAgent = spawnDude(thisSpawn)
 	thePath = goalPath(thisPath,:,thisSpawn); % get the random path 
 	offset = 410;
 	if (spawn(1) > spawn(3))
-  	positionX = randi([(spawn(3)+offset+1000) (spawn(1)-offset)]);
+  	positionX = randi([(spawn(3)+offset) (spawn(1)-offset)]);
 	elseif (spawn(1) < spawn(3))
-  	positionX = randi([(spawn(1)+offset+1000) (spawn(3)-offset)]);
+  	positionX = randi([(spawn(1)+offset) (spawn(3)-offset)]);
   	else
   	positionX = spawn(1);
 	end
 	if (spawn(2) > spawn(4))
-  	positionY = randi([(spawn(4)+offset+1000) (spawn(2)-offset)]);
+  	positionY = randi([(spawn(4)+offset) (spawn(2)-offset)]);
 	elseif(spawn(4) > spawn(2))
-  	positionY = randi([(spawn(2)+offset+1000) (spawn(4)-offset)]);
+  	positionY = randi([(spawn(2)+offset) (spawn(4)-offset)]);
   	else 
   	positionY = spawn(2);
 	end
@@ -30,6 +30,6 @@ function anAgent = spawnDude(thisSpawn)
 	anAgent.pathLength = size(thePath)(2);
 	anAgent.inModel = true;
 	anAgent.maxVel = 4.0*300 + randi([0 240]);
-	anAgent.goalDirection = [0,0];
+	anAgent.goalForce = [0,0];
 	%disp(anAgent)
 end

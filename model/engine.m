@@ -39,7 +39,7 @@ function tracks = looptest
   % array of wall points
   % needs to be configured from the starting file
   % 1ft = 304.8mm (300)
-  wallPoints = [[-4165,-1460];[4217,-1460];[-4165,978];[-1280,978];[1280,978];[4217,978];[-491,6823];[-1280,978];[1280,978];[1280,6823]]; % T
+  wallPoints = [[-4165,-1460];[4217,-1460];[-4165,978];[-1280,978];[1280,978];[4217,978];[-1280,6823];[-1280,978];[1280,978];[1280,6823]]; % T
   % array of goals [x1,y1,x2,y2] for each goal
   offset = 0;
   %goRight = 4;
@@ -125,9 +125,9 @@ function current_frame = timestep(buffer_zero)
     extraStructSpots(1) = 0;
     %SPAWN DEM DUDES
     %flux from each entrance per second
-    spawnRate1 = 1;
-    spawnRate2 = 1;
-    spawnRate3 = 1;
+    spawnRate1 = 0.7;
+    spawnRate2 = 0.7;
+    spawnRate3 = 0.7;
     % get an array of three random numbers [a, b, c] 
     random = 0 + (1/configuration.dt)*rand(3,1);
     structSize = length((agentStruct));
@@ -246,11 +246,11 @@ function current_frame = timestep(buffer_zero)
             %fprintf(fileID,'Agent: %3.0f from agent: %3.0f -> x is %8.0f , y is %8.0f\n', agent, otherAgent, Force);
           end
         end
-        agentStruct(agent).goalDirection = forceFromGoal/norm(forceFromGoal);
+        agentStruct(agent).goalForce = forceFromGoal;
         end
         
         %fprintf(fileID,'Agent: %3.0f forceGoalAPPLIED -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
-        mult = 0.1;
+        mult = 0.35;
         MainForceVector(agent * 2 - 1) = ForceVector(1)*mult;
         MainForceVector(agent * 2) = ForceVector(2)*mult;
 
@@ -282,21 +282,24 @@ function current_frame = timestep(buffer_zero)
         	% dummy variable for velocity below
         	previousPos = agentStruct(theAgent).pos;
         	% calculate the new position att + vt + x
-        	agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt;
+        	agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt*1.95;
         	% calculate new velocity (current pos - previous pos) / t
+        	
         	agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
         	direction = agentStruct(theAgent).vel/norm(agentStruct(theAgent).vel);
         	Xpos = agentStruct(theAgent).pos(1);
         	Ypos = agentStruct(theAgent).pos(2);
-        	if(sign(agentStruct(theAgent).goalDirection(1)) != 0 && sign(agentStruct(theAgent).goalDirection(1)) != sign(direction(1)))
+        	if(sign(agentStruct(theAgent).goalForce(1)) != 0 && sign(agentStruct(theAgent).goalForce(1)) != sign(direction(1)) && agentStruct(theAgent).goalForce(1) > 100)
         	  Xpos = previousPos(1);
-        	
+        	  
         	end
-        	if(sign(agentStruct(theAgent).goalDirection(2)) != 0 && sign(agentStruct(theAgent).goalDirection(2)) != sign(direction(2)))
+        	if(sign(agentStruct(theAgent).goalForce(2)) != 0 && sign(agentStruct(theAgent).goalForce(2)) != sign(direction(2)) && agentStruct(theAgent).goalForce(2) > 100)
         	  Ypos = previousPos(2);
-        	
+        	  
         	end
+        	
         	agentStruct(theAgent).pos = [Xpos Ypos];
+        	  agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
         	%disp(agentStruct(theAgent).vel)
         	%this movement exceeded the max allowed velocity
         	if (norm(agentStruct(theAgent).vel) > agentStruct(theAgent).maxVel)

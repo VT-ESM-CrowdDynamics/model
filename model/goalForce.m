@@ -13,7 +13,7 @@ function [forceFromGoal, goRightForce] = goalForce(agentPosVector, goalPoint1, g
 	%length of line
 	length = norm(lineVector);
 	%dummy variables
-	force = -50000;
+	force = 50000;
 	forceFromGoal = [0,0];
 	goRightForce = [0,0];
 	%prjectionMagnitude = 0;
@@ -24,9 +24,10 @@ function [forceFromGoal, goRightForce] = goalForce(agentPosVector, goalPoint1, g
 		%beyond goalPoint1
 		distence1 = norm(agentPosVector-goalPoint1); %distence from goalPoint to person
 		if (distence1 > maxDistence)	
-			direction = (agentPosVector - goalPoint1)/distence1;
+			mainDirection = (agentPosVector - goalPoint1)/distence1;
 			%force = -500; 
-			forceFromGoal = force*direction;
+			direction = (goalPoint2-goalPoint1);
+			forceFromGoal = force*(direction/norm(direction)+mainDirection);
 		else
 			%the person is at the goal!
 			%disp("AT GOALLLLL")
@@ -38,9 +39,10 @@ function [forceFromGoal, goRightForce] = goalForce(agentPosVector, goalPoint1, g
 		
 		distence2 = norm(agentPosVector-goalPoint2); %distence from goalPoint to person
 		if (distence2 > maxDistence)	
-			direction = (agentPosVector - goalPoint2)/distence2;
+			mainDirection = (agentPosVector - goalPoint2)/distence2;
 			%force = -500; 
-			forceFromGoal = force*direction;
+			direction = (goalPoint1-goalPoint2);
+			forceFromGoal = force*(direction/norm(direction) + mainDirection);
 		else
 			%the person is at the goal!
 
@@ -56,13 +58,13 @@ function [forceFromGoal, goRightForce] = goalForce(agentPosVector, goalPoint1, g
 
 			direction = (agentPosVector - pb)/distence3;
 			%force = -500; 
-			forceFromGoal = force*direction;
+			forceFromGoal = -1*force*direction;
 			% we only want to apply a 'move to the right side of a hallway force' 
 		% if the person is still headed towords the goal 
 		% hopefully this will prevent someone from going down a hallway on their right
 		% without it being a goal
-			if (norm(pb-goalPoint1) > 400 && norm(pb-goalPoint2) > 400)
-			goRightForce = 20*goRight(-1*direction);
+			if (norm(pb-goalPoint1) > 200 && norm(pb-goalPoint2) > 200)
+			goRightForce = 100*goRight(-1*direction);
 			end
 		else
 			%at the goal
