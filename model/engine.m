@@ -250,7 +250,7 @@ function current_frame = timestep(buffer_zero)
         end
         
         %fprintf(fileID,'Agent: %3.0f forceGoalAPPLIED -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
-        mult = 0.35;
+        mult = 0.30;
         MainForceVector(agent * 2 - 1) = ForceVector(1)*mult;
         MainForceVector(agent * 2) = ForceVector(2)*mult;
 
@@ -282,19 +282,20 @@ function current_frame = timestep(buffer_zero)
         	% dummy variable for velocity below
         	previousPos = agentStruct(theAgent).pos;
         	% calculate the new position att + vt + x
-        	agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt*1.95;
+        	agentStruct(theAgent).pos = agentStruct(theAgent).pos + Force * (configuration.dt) ^ 2 + agentStruct(theAgent).vel * configuration.dt*2;
         	% calculate new velocity (current pos - previous pos) / t
         	
         	agentStruct(theAgent).vel = (agentStruct(theAgent).pos - previousPos) / configuration.dt;
         	direction = agentStruct(theAgent).vel/norm(agentStruct(theAgent).vel);
         	Xpos = agentStruct(theAgent).pos(1);
         	Ypos = agentStruct(theAgent).pos(2);
-        	if(sign(agentStruct(theAgent).goalForce(1)) != 0 && sign(agentStruct(theAgent).goalForce(1)) != sign(direction(1)) && agentStruct(theAgent).goalForce(1) > 100)
-        	  Xpos = previousPos(1);
-        	  
+        	% dont let the agent go backwards, this isnt completly working right now... 
+        	if(sign(agentStruct(theAgent).goalForce(1)) != 0 && sign(agentStruct(theAgent).goalForce(1)) != sign(direction(1)) && agentStruct(theAgent).goalForce(1) > 10)
+        	  Xpos = previousPos(1)
+        	 
         	end
-        	if(sign(agentStruct(theAgent).goalForce(2)) != 0 && sign(agentStruct(theAgent).goalForce(2)) != sign(direction(2)) && agentStruct(theAgent).goalForce(2) > 100)
-        	  Ypos = previousPos(2);
+        	if(sign(agentStruct(theAgent).goalForce(2)) != 0 && sign(agentStruct(theAgent).goalForce(2)) != sign(direction(2)) && agentStruct(theAgent).goalForce(2) > 10)
+        	  Ypos = previousPos(2)
         	  
         	end
         	

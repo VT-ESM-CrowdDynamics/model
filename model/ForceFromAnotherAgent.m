@@ -43,7 +43,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
     else%if (dodgeSideways < 1/2)
     	%ForceVector = relativePosOfOther*-0.05*(10000+1/((distence+50)))-500*VelOther;
     %else
-      ForceVector = relativePosOfOther*-0.04*(10000+1/((distence+50)))  +0.5*goRight(theSign(3)*forceFromGoal);
+      ForceVector = relativePosOfOther*-0.04*(10000+1/((distence+50)))  +0.3*goRight(theSign(3)*forceFromGoal);
     end
   
   % probably want another elseif here to check line of sight (theta = acos( v1.v2) / |v1||v2|).  we still want to check if people hit bc line of sight doesnt effect that.  but if people dont see each other these forces dont matter... unless talking group stuff... 
@@ -58,7 +58,7 @@ function ForceVector = ForceFromAnotherAgent(AgentPosVector, AgentVelVector, Oth
       %if (dodgeSideways < 1/2)
     	%ForceVector = force*relativePosOfOther/distence*-1 -500*VelOther;
       %else
-      ForceVector = force*relativePosOfOther/distence*-1 +0.5*goRight(theSign(3)*forceFromGoal);
+      ForceVector = force*relativePosOfOther/distence*-1 +0.3*goRight(theSign(3)*forceFromGoal);
       %end
       % something should be done here with velocity so people moving towords each other 'prepare' to dodge, and someone can 'pass' another person if v in same direction etc
       % determine probability of wanting to 'dodge' right or left (culture) (should user set this?)

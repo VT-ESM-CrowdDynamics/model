@@ -24,7 +24,7 @@ function [forceFromGoal, goRightForce] = goalForce(agentPosVector, goalPoint1, g
 		%beyond goalPoint1
 		distence1 = norm(agentPosVector-goalPoint1); %distence from goalPoint to person
 		if (distence1 > maxDistence)	
-			mainDirection = (agentPosVector - goalPoint1)/distence1;
+			mainDirection = -1*(agentPosVector - goalPoint1)/distence1;
 			%force = -500; 
 			direction = (goalPoint2-goalPoint1);
 			forceFromGoal = force*(direction/norm(direction)+mainDirection);
@@ -39,7 +39,7 @@ function [forceFromGoal, goRightForce] = goalForce(agentPosVector, goalPoint1, g
 		
 		distence2 = norm(agentPosVector-goalPoint2); %distence from goalPoint to person
 		if (distence2 > maxDistence)	
-			mainDirection = (agentPosVector - goalPoint2)/distence2;
+			mainDirection = -1*(agentPosVector - goalPoint2)/distence2;
 			%force = -500; 
 			direction = (goalPoint1-goalPoint2);
 			forceFromGoal = force*(direction/norm(direction) + mainDirection);
