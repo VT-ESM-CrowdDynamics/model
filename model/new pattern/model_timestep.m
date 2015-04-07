@@ -1,6 +1,6 @@
 % must preload buffer with two frames
 function current_frame = model_timestep()
-  global frame;
+  global frame_num;
   global configuration;
   global buffer;
 
@@ -53,9 +53,9 @@ function current_frame = model_timestep()
   % disp('update done')
 
   % increment frame # and time for current_frame for "header"
-  frame_time = [buffer(tminus(1, frame), 1) + 1, buffer(tminus(1, frame), 2) + configuration.dt];
+  frame_time = [buffer(tminus(1), 1) + 1, buffer(tminus(1), 2) + configuration.dt];
 
-  tminus1 = buffer(tminus(1, frame), 3:end);
+  tminus1 = buffer(tminus(1), 3:end);
   current_frame = [frame_time, tminus1 + delta];
   % disp('loop end')
 end

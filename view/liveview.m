@@ -42,13 +42,13 @@ if ~exist('profiling_enabled', 'var')
 	profiling_enabled = 0;
 end
 
+if profiling_enabled
+	profile on;
+end
+
 % frames to skip, often 60/120 hz
 if ~exist('frameskip', 'var')
 	frameskip = 0;
-end
-
-if profiling_enabled
-	profile on;
 end
 
 if ~exist('headerlines', 'var')

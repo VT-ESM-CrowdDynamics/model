@@ -13,14 +13,14 @@ function model_loop
   % extra init scripts hook
   extra_init;
 
-  global frame;
+  global frame_num;
   % loop through requested frames
-  for frame = 3 : configuration.frames
+  for frame_num = 3 : configuration.frames
     % disp('looping!')
-    % disp(frame)
+    % disp(frame_num)
     % disp(buffer)
     current_frame = model_timestep();
-    buffer(tminus(0, frame),:) = current_frame;
+    buffer(tminus(0, frame_num),:) = current_frame;
     disp(tsv_out(current_frame));
     % disp('-------')
   end

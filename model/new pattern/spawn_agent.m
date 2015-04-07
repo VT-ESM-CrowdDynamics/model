@@ -1,12 +1,18 @@
 function spawn_agent()
   % global fileID;
   global configuration;
-  global frame;
   global buffer;
+  global goal_paths;
 
-  active = configuration.agents - sum(isnan(buffer(tminus(1,frame)(3:end))))/2;
+  % buffer
+  slot_num = tminus(1);
+  buffer_slot = buffer(slot_num, :);
+  last_frame = buffer_slot(3:end);
+  nanframe = isnan(last_frame);
+  nans = sum(nanframe);
+  active = configuration.agents - nans/2;
   % new agent number
-  agentNum = active + 1;
+  agent_num = active + 1;
 
   %SPAWN DEM DUDES
   %flux from each entrance per second
@@ -31,14 +37,20 @@ function spawn_agent()
     %disp("3333333")
     start_spawn = 3;
   else
+    % disp ('no spawn today');
     return
   end
   %disp("PAST");
 
+  global spawn_points;
+  spawn_points(agent_num) = start_spawn;
+  global current_goals;
+  current_goals(agent_num) = 1;
+
   % array of spawns like goals
   spawnArray = [[-4,-20,4,-20];[-14,0,-14,8];[14,0,14,8]]*300;
   
-  goal_paths(agentNum) = randi([1 2]) % get the random path 
+  goal_paths(agent_num) = randi([1 2]); % get the random path num
 
   spawn = spawnArray(start_spawn,:); % get the random spawn line
   if (spawn(1) > spawn(3))
@@ -57,12 +69,11 @@ function spawn_agent()
   end
 
   global buffer;
-  global frame;
 
   % set last position
-  buffer(tminus(1, frame))(3+agent_num:4+agent_num) = [positionX, positionY];
-  % set velocity 0 ( no difference )
-  buffer(tminus(1, frame))(3+agent_num:4+agent_num) = [positionX, positionY];
+  buffer(tminus(1), 1+2*agent_num:2+2*agent_num) = [positionX, positionY];
+  % set velocity 0 ( no difference from last last position )
+  buffer(tminus(1), 1+2*agent_num:2+2*agent_num) = [positionX, positionY];
 
   current_goals(agent_num) = 1;
   velocity_upper_limits(agent_num) = 4.0*300 + randi([0 240]);

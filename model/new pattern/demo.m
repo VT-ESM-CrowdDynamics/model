@@ -1,7 +1,7 @@
 global configuration;
-configuration.dt = 1;
-configuration.frames = 500;
-configuration.agents = 100;
+configuration.dt = .1;
+configuration.frames = 20;
+configuration.agents = 9;
 configuration.buffer_size = 5;
 configuration.functions = {@function1, @function2, @wallForce, @frictionForce, @ufoForce};
 configuration.parallel = 'no';
