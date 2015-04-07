@@ -1,5 +1,6 @@
-function this_delta = function1(agent_num, frame)
+function this_delta = function1(agent_num)
     global buffer;
+    global frame;
 
     tminus2 = buffer(tminus(2, frame), 3:end);
     tminus1 = buffer(tminus(1, frame), 3:end);
