@@ -1,4 +1,4 @@
-function current_frame = update(MainForceVector, current_frame)
+function current_frame = goal_update(MainForceVector, current_frame)
   global fileID;
   global configuration;
   global buffer;

@@ -15,7 +15,7 @@ function this_delta = wallForce(agent_num)
   global velocity_upper_limits;
   global configuration;
   maxDistance = velocity_upper_limits(agent_num)*configuration.dt;
-
+  wall_forces = [0, 0];
   for wall = 1:length(configuration.wallPoints)/2
     wallPoint1 = configuration.wallPoints(wall*2 - 1,:);
     wallPoint2 = configuration.wallPoints(wall*2,:);
@@ -25,13 +25,13 @@ function this_delta = wallForce(agent_num)
     %vector representing line segment
     lineVector = wallPoint2 - wallPoint1;
     %needed constants looked up formula online
-    c1 = dot(relative, lineVector) ;
+    c1 = dot(relative, lineVector);
     c2 = dot(lineVector, lineVector);
     %length of line
     length = norm(lineVector);
     %dummy variables
-    force = 0;
-    forceMultiplyer = 1; %arbitrary const to balance
+    force = 5;
+    forceMultiplyer = 5; %arbitrary const to balance
     forceFromWall = [0,0];
     %prjectionMagnitude = 0;
     %if (length > 0)
@@ -100,9 +100,9 @@ function this_delta = wallForce(agent_num)
       end
       
     end
-
+    wall_forces = wall_forces + forceFromWall;
   end
-  this_delta = forceFromWall;
+  this_delta = wall_forces;
 end
 
 

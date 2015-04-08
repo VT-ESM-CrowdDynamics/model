@@ -69,6 +69,7 @@ for a = 1:headerlines
 	input('','s');
 end
 global configuration;
+
 hold on
 if exist('configuration', 'var')
 	if isfield(configuration, 'wallPoints')

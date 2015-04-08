@@ -51,33 +51,30 @@ function current_frame = model_timestep()
     current_goals = result(2, 1:2:end);
   end
 
-  delta = regular + nonconform;
+  forces = regular + nonconform;
   % save to buffer so can rate limit
   slot_num = tminus(0);
-  buffer(slot_num, 3:end) = delta;
+  buffer(slot_num, 3:end) = forces;
 
 
   % rate limit
-  braking = zero;
+  limited = zero;
   switch configuration.parallel
   case 'no'
     for theAgent = 1:configuration.agents
-      braking(theAgent*2-1:theAgent*2) = rate_limit(theAgent);
+      limited(theAgent*2-1:theAgent*2) = rate_limit(theAgent);
     end
   case 'matlab'
     parfor theAgent = 1:configuration.agents
-      braking(theAgent*2-1:theAgent*2) = rate_limit(theAgent);
+      limited(theAgent*2-1:theAgent*2) = rate_limit(theAgent);
     end
   case 'octave'
-    braking = pararrayfun(nproc(), @rate_limit, 1:configuration.agents, 'VerboseLevel', 0);
+    limited = pararrayfun(nproc(), @rate_limit, 1:configuration.agents, 'VerboseLevel', 0);
   end
-
-  delta = delta + braking;
-
 
   % increment frame # and time for current_frame for "header"
   frame_time = [buffer(tminus(1), 1) + 1, buffer(tminus(1), 2) + configuration.dt];
-  tminus1 = buffer(tminus(1), 3:end);
-  current_frame = [frame_time, tminus1 + delta];
+  % new positions from limited
+  current_frame = [frame_time, limited];
   % disp('update done')
 end
