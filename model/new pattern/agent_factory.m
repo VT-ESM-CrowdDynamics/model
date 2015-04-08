@@ -2,7 +2,7 @@
 % originally spawnDude
 function agent_factory(agents, start_spawn)
   global configuration;
-  agent_num = agents + start_spawn;
+  agent_num = agents + 1;
   global goal_paths;
   global velocity_upper_limits;
   global spawn_points;

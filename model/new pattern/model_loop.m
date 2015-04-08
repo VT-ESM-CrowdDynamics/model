@@ -24,4 +24,6 @@ function model_loop
     disp(tsv_out(current_frame));
     % disp('-------')
   end
+  pause
+  disp('');
 end

@@ -19,21 +19,25 @@ function spawn_agent()
   % get an array of three random numbers [a, b, c] 
   random = 0 + (1/configuration.dt)*rand(3,1);
   random = [1,1,1];
+
   %disp("aa")
   if (random(1) <= spawnRate1 && active < configuration.agents)
     %spawn a dude at 1
     %disp("11111")
     agent_factory(active, 1);
+    active = active + 1;
   end
-  if (random(2) <= spawnRate2 && active + 1 < configuration.agents)
+  if (random(2) <= spawnRate2 && active< configuration.agents)
     %spawn a dude at 2
     %disp("2222222")
     agent_factory(active, 2);
+    active = active + 1;
   end
-  if (random(3) <= spawnRate3 && active  + 2< configuration.agents)
+  if (random(3) <= spawnRate3 && active< configuration.agents)
     %spawn a dude at 3
     %disp("3333333")
     agent_factory(active, 3);
+    active = active + 1;
   else
   %disp("PAST");
 end

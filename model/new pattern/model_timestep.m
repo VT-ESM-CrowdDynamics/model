@@ -34,6 +34,7 @@ function current_frame = model_timestep()
 
   % non-conforming functions
   % goal force needs to update outside parallel environment
+  global current_goals;
   nonconform = zero;
   switch configuration.parallel
   case 'no'

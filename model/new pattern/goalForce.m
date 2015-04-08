@@ -38,20 +38,24 @@ function this_delta = goalForce(agent_num)
   goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
 
   % originally G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
-  path = goalPath(path_num, spawn_points(agent_num), :);
+  path = goalPath(path_num, :, spawn_points(agent_num));
   current_goal = path(current_goal_num);
   G = goalArray(path(current_goal_num),:); %get the goal array
   forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
+  % disp('DEBUG: -------------------------');
+  % disp(strcat('DEBUG: current_goal_num:', num2str(current_goal_num)));
+  % disp(strcat('DEBUG: path:', num2str(path)));
   %fprintf(fileID,'Agent: %3.0f forceGoal1 -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
   % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
   % if the agent is close to a goal then make the next goal active
   % the agent could possibly satisfy multiple goals at once -> while loop
+  % disp(strcat('DEBUG: length(path):', num2str(length(path))));
   while(norm(forceFromGoal) < 1 && current_goal_num < length(path))
     %disp("in the goal loop")
     % fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> # %5.0f\n', agent, current_goal_num );
     current_goal_num = current_goal_num + 1;
     % originally G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
-    path = goalPath(path_num,:,spawn_points(agent_num));
+    path = goalPath(path_num,:, spawn_points(agent_num));
     current_goal = path(current_goal_num);
     G = goalArray(path(current_goal_num),:); %get the goal array
     forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
@@ -66,7 +70,13 @@ function this_delta = goalForce(agent_num)
   end
   this_delta = forceFromGoal;
   this_delta(2,1) = current_goal_num;
-  disp(strcat('DEBUG: goalforce ', num2str(forceFromGoal)));
-  disp(strcat('DEBUG: goalnum ', num2str(current_goal_num)));
-
+  
+  % disp('DEBUG: -------------------------');
+  % disp(strcat('DEBUG: current_goal_num:', num2str(current_goal_num)));
+  % disp('DEBUG: -------------------------');
+  % disp(strcat('DEBUG: goalforce:', num2str(forceFromGoal)));
+  % % disp(strcat('DEBUG: current_goal:', num2str(current_goal)));
+  % disp(strcat('DEBUG: max_distance:', num2str(max_distance)));
+  % disp(strcat('DEBUG: norm(forceFromGoal):', num2str(norm(forceFromGoal))));
 end
+

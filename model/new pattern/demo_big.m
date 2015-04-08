@@ -1,6 +1,6 @@
 global configuration;
-configuration.frames = 50;
-configuration.agents = 50;
+configuration.frames = 500;
+configuration.agents = 20;
 config;
 model_init(configuration);
 % disp('serial')

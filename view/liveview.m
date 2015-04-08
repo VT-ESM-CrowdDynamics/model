@@ -78,8 +78,21 @@ if exist('configuration', 'var')
 			x = [points(wall*2 - 1,1),points(wall*2,1)];
 			y = [points(wall*2 - 1,2),points(wall*2,2)];
 			plot(x,y);
-			plot(x(1), y(1), 'b*');
-			plot(x(2), y(2), 'b*');
+			% plot(x(1), y(1), 'b*');
+			% plot(x(2), y(2), 'b*');
+		end
+	end
+	if isfield(configuration, 'goalArray')
+		marker = ['+' 'x' 'diamond' 'pentagram' 'o' 'square'];
+		marker = ['+' 'x' 'd' 'p' 'o' 's']
+		goals = configuration.goalArray;
+		for goal = 1:6
+			points = goals(goal,:)
+			x = [points(1),points(3)];
+			y = [points(2),points(4)];
+			plot(x,y,'--');
+			plot(points(1), points(2), marker(goal), 'MarkerSize', 15);
+			plot(points(3), points(4), marker(goal), 'MarkerSize', 15);
 		end
 	end
 	if isfield(configuration, 'view_size')
@@ -101,6 +114,10 @@ while ~(strcmpi(line,''))
 	% disp('main loop')
 	% disp(fields(1:2))
 	if ~isstrprop(line(1), 'digit')
+		if strcmp('', line())
+			pause
+			exit
+		end
 		if strcmp('DEBUG', line(1:5))
 			disp(line);
 		end

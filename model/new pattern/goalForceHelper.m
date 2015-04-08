@@ -1,5 +1,7 @@
 function forceFromGoal = goalForceHelper(agentPosVector, goalPoint1, goalPoint2, maxDistance, agentVelVector)
-
+	% if debug
+ %    disp(strcat('DEBUG: current_goal_num:', num2str(current_goal_num)));
+	% end
 	%vector from all point to agent
 	relative = agentPosVector - goalPoint1;
 	%vector representing line segment
