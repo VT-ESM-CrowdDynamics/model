@@ -1,3 +1,5 @@
+% agent_factory is the common code in 3 calls from spawn_agent
+% originally spawnDude
 function agent_factory(agents, start_spawn)
   global configuration;
   agent_num = agents + start_spawn;

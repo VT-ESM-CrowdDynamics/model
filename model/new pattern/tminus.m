@@ -1,4 +1,4 @@
-% make buffer indexing less verbose
+% make circular buffer indexing less verbose
 function new_index = tminus(n)
   global configuration;
   global frame_num;

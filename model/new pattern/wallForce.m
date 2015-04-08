@@ -9,6 +9,7 @@ function this_delta = wallForce(agent_num)
   this_last_delta = last_delta(2*agent_num-1:2*agent_num);
   % this_delta = this_last_position+[agent_num,1];
 
+  % adapter variables
   agentPosVector = this_last_position;
   agentVelVector = this_last_delta;
 
@@ -30,7 +31,7 @@ function this_delta = wallForce(agent_num)
     %length of line
     length = norm(lineVector);
     %dummy variables
-    force = 5;
+    force = 0;
     forceMultiplyer = 5; %arbitrary const to balance
     forceFromWall = [0,0];
     %prjectionMagnitude = 0;

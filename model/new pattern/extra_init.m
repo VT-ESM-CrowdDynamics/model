@@ -1,3 +1,4 @@
+% extra stuff to initialize, mostly shared variables
 function extra_init()
   % goals init
   global configuration;

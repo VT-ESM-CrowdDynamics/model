@@ -18,6 +18,7 @@ function spawn_agent()
   spawnRate3 = 1;
   % get an array of three random numbers [a, b, c] 
   random = 0 + (1/configuration.dt)*rand(3,1);
+  random = [1,1,1];
   %disp("aa")
   if (random(1) <= spawnRate1 && active < configuration.agents)
     %spawn a dude at 1

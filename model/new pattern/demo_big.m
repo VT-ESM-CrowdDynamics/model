@@ -1,5 +1,5 @@
 global configuration;
-configuration.frames = 500;
+configuration.frames = 50;
 configuration.agents = 50;
 config;
 model_init(configuration);
@@ -9,6 +9,6 @@ model_init(configuration);
 % configuration.parallel = 'matlab';
 % disp('matlab parallel')
 % model_loop;
-% configuration.parallel = 'octave';
+configuration.parallel = 'octave';
 % disp('octave parallel')
 model_loop;

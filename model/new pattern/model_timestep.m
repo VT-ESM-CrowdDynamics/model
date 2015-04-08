@@ -11,6 +11,9 @@ function current_frame = model_timestep()
   % TODO: these three loops need refactored to one loop so threads can stay
   % active longer and decrease parallel overhead
 
+  % each of these switches runs with serial or matlab parallel or octave
+  % parallel, depending on configuration.parallel
+
   % regular forces
   regular = zero;
   switch configuration.parallel
@@ -53,7 +56,7 @@ function current_frame = model_timestep()
 
   forces = regular + nonconform;
   % save to buffer so can rate limit
-  slot_num = tminus(0);
+  slot_num = tminus(0); % current slot as temporary space
   buffer(slot_num, 3:end) = forces;
 
 

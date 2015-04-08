@@ -33,6 +33,8 @@ function this_delta = goalForce(agent_num)
   % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call configuration.goalArray(2) then configuration.goalArray(5)
   % as the agent moves from goal to goal
   goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
+
+  % originally G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
   path = goalPath(path_num, spawn_points(agent_num), :);
   current_goal = path(current_goal_num);
   G = goalArray(path(current_goal_num),:); %get the goal array
@@ -45,13 +47,12 @@ function this_delta = goalForce(agent_num)
     %disp("in the goal loop")
     % fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> # %5.0f\n', agent, current_goal_num );
     current_goal_num = current_goal_num + 1;
-    path = goalPath(path_num, spawn_points(agent_num),:);
+    % originally G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
+    path = goalPath(path_num,:,spawn_points(agent_num));
     current_goal = path(current_goal_num);
     G = goalArray(path(current_goal_num),:); %get the goal array
     forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], velocity_upper_limits(agent_num)*configuration.dt, this_last_delta); % get goal force from function
     % fprintf(fileID,'Agent:%2.0f G = %4.0f %4.0f %4.0f %4.0f\n', agent, G );
-    forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], velocity_upper_limits(agent_num)*configuration.dt, this_last_delta);
-    % fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> x %5.0f , y %5.0f\n , norm =%5.0f\n', agent, forceFromGoal, norm(forceFromGoal));
   end
   %disp("EE");
   if (norm(forceFromGoal) < 1)

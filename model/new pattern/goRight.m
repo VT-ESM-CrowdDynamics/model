@@ -1,3 +1,4 @@
+% lane formation
 function rightForce = goRight(vel)
   
   rightForce = 0;
