@@ -68,7 +68,22 @@ end
 for a = 1:headerlines
 	input('','s');
 end
+if exist('configuration', 'var')
+	if isfield(configuration, 'wallPoints')
+		points = configuration.wallPoints;
+		for wall = 1:length(points)/2
+			x = [points(wall*2 - 1,1),points(wall*2 - 1,2)];
+			y = [points(wall*2,1),points(wall*2,2)];
+			plot(x,y);
+		end
+	end
+	if isfield(configuration, 'view_size')
+		size = configuration.view_size;
+	end
+end
 hold on
+
+
 axis([-size size -size size])
 line = input('', 's');
 % file = fopen('game-day test2, only labeled, first 50.tsv')

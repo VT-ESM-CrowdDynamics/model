@@ -1,20 +1,5 @@
-% 1;
-
-
-% function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, wallPoint2, maxDistence)
-  % agentPosVector, agentVelVector, wallPoint1, wallPoint2
-  % wallForce(pos, vel, wallPoints(wall*2 - 1,:), wallPoints(wall*2,:), maxDistence;
-
-
 function this_delta = wallForce(agent_num)
   global buffer;
-
-  % array of wall points
-  % needs to be configured from the starting file
-  % 1ft = 304.8mm (300)
-  wallPoints = [[-4,-20];[-4,0];[4,-20];[4,0];[-4,0];[-14,0];[4,0];[14,0];[-14,8];[14,8]]*300; % T
-
-
 
   tminus2 = buffer(tminus(2), 3:end);
   tminus1 = buffer(tminus(1), 3:end);
@@ -27,12 +12,14 @@ function this_delta = wallForce(agent_num)
   agentPosVector = this_last_position;
   agentVelVector = this_last_delta;
 
-  wallPoint1 = wallPoints(wall*2 - 1,:);
-  wallPoint2 = wallPoints(wall*2,:);
+  global velocity_upper_limits;
+  global configuration;
+  maxDistance = velocity_upper_limits(agent_num)*configuration.dt;
 
-  maxDistence = agentStruct(agent).maxVel*configuration.dt;
+  for wall = 1:length(configuration.wallPoints)/2
+    wallPoint1 = configuration.wallPoints(wall*2 - 1,:);
+    wallPoint2 = configuration.wallPoints(wall*2,:);
 
-  for wall = 1:5
     %vector from all point to agent
     relative = agentPosVector - wallPoint1;
     %vector representing line segment
