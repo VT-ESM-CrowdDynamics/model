@@ -8,6 +8,8 @@ function current_frame = model_timestep()
   spawn_agent();
   % disp('update start')
 
+  % TODO: these three loops need refactored to one loop so threads can stay
+  % active longer and decrease parallel overhead
 
   % regular forces
   regular = zero;
