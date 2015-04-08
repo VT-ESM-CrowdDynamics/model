@@ -26,6 +26,9 @@ function this_delta = goalForce(agent_num)
 
   path_num = goal_paths(agent_num);
 
+  max_distance = velocity_upper_limits(agent_num)*configuration.dt;
+  % disp(strcat('DEBUG: max_distance ', num2str(max_distance)));
+
   % array of goals [x1,y1,x2,y2] for each goal
   goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
   % array of possible paths from goal to goal, path# assigned randomly to each agent
@@ -38,7 +41,7 @@ function this_delta = goalForce(agent_num)
   path = goalPath(path_num, spawn_points(agent_num), :);
   current_goal = path(current_goal_num);
   G = goalArray(path(current_goal_num),:); %get the goal array
-  forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], velocity_upper_limits(agent_num)*configuration.dt, this_last_delta); % get goal force from function
+  forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
   %fprintf(fileID,'Agent: %3.0f forceGoal1 -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
   % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
   % if the agent is close to a goal then make the next goal active
@@ -51,7 +54,7 @@ function this_delta = goalForce(agent_num)
     path = goalPath(path_num,:,spawn_points(agent_num));
     current_goal = path(current_goal_num);
     G = goalArray(path(current_goal_num),:); %get the goal array
-    forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], velocity_upper_limits(agent_num)*configuration.dt, this_last_delta); % get goal force from function
+    forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
     % fprintf(fileID,'Agent:%2.0f G = %4.0f %4.0f %4.0f %4.0f\n', agent, G );
   end
   %disp("EE");
@@ -63,6 +66,7 @@ function this_delta = goalForce(agent_num)
   end
   this_delta = forceFromGoal;
   this_delta(2,1) = current_goal_num;
-
+  disp(strcat('DEBUG: goalforce ', num2str(forceFromGoal)));
+  disp(strcat('DEBUG: goalnum ', num2str(current_goal_num)));
 
 end

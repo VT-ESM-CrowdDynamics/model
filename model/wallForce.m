@@ -13,7 +13,7 @@ function forceFromWall = wallForce(agentPosVector, agentVelVector, wallPoint1, w
 	length = norm(lineVector);
 	%dummy variables
 	force = 0;
-	forceMultiplyer = 1; %arbitrary const to balance
+	forceMultiplyer = 0; %arbitrary const to balance
 	forceFromWall = [0,0];
 	%prjectionMagnitude = 0;
 	%if (length > 0)

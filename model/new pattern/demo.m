@@ -1,8 +1,8 @@
 global configuration;
 config;
-configuration.frames = 200;
+configuration.frames = 300;
 configuration.agents = 1;
-configuration.dt = .2;
+configuration.dt = .1;
 model_init(configuration);
 % disp('serial')
 % configuration.parallel = 'no';

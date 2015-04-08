@@ -41,6 +41,7 @@ function current_frame = model_timestep()
       result = goalForce(theAgent); % position + non-conforming updates
       nonconform(theAgent*2-1:theAgent*2) = result(1, :); %position
       current_goals(theAgent) = result(2, 1); % goal
+      % disp(strcat('DEBUG: goal ', num2str(result(2,1))));
     end
   case 'matlab'
     parfor theAgent = 1:configuration.agents

@@ -13,7 +13,7 @@ function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2, maxDi
 	%length of line
 	length = norm(lineVector);
 	%dummy variables
-	force = -4000;
+	force = -3000;
 	forceFromGoal = [0,0];
 	%prjectionMagnitude = 0;
 	%if (length > 0)
