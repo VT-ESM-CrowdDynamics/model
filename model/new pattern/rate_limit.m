@@ -8,6 +8,8 @@ function this_delta = rate_limit(agent_num)
   velocity = norm(this_delta);
   velmax = velocity_upper_limits(agent_num);
 
+  % TODO: add active check
+
   %this movement exceeded the max allowed velocity
   if (velocity > velocity_upper_limits(agent_num))
     %disp("adjust vel")
