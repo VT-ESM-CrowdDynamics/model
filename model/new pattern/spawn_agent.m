@@ -13,9 +13,9 @@ function spawn_agent()
 
   %SPAWN DEM DUDES
   %flux from each entrance per second
-  spawnRate1 = 10;
-  spawnRate2 = 10;
-  spawnRate3 = 10;
+  spawnRate1 = 1;
+  spawnRate2 = 1;
+  spawnRate3 = 1;
   % get an array of three random numbers [a, b, c] 
   random = 0 + (1/configuration.dt)*rand(3,1);
   %disp("aa")

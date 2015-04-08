@@ -77,6 +77,8 @@ if exist('configuration', 'var')
 			x = [points(wall*2 - 1,1),points(wall*2,1)]
 			y = [points(wall*2 - 1,2),points(wall*2,2)]
 			plot(x,y);
+			plot(x(1), y(1), 'b*');
+			plot(x(2), y(2), 'b*');
 		end
 	end
 	if isfield(configuration, 'view_size')
