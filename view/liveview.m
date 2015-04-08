@@ -68,12 +68,14 @@ end
 for a = 1:headerlines
 	input('','s');
 end
+global configuration;
+hold on
 if exist('configuration', 'var')
 	if isfield(configuration, 'wallPoints')
 		points = configuration.wallPoints;
 		for wall = 1:length(points)/2
-			x = [points(wall*2 - 1,1),points(wall*2 - 1,2)];
-			y = [points(wall*2,1),points(wall*2,2)];
+			x = [points(wall*2 - 1,1),points(wall*2,1)]
+			y = [points(wall*2 - 1,2),points(wall*2,2)]
 			plot(x,y);
 		end
 	end
@@ -81,7 +83,6 @@ if exist('configuration', 'var')
 		size = configuration.view_size;
 	end
 end
-hold on
 
 
 axis([-size size -size size])
