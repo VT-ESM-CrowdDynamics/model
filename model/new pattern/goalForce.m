@@ -42,6 +42,7 @@ function this_delta = goalForce(agent_num)
   current_goal = path(current_goal_num);
   G = goalArray(path(current_goal_num),:); %get the goal array
   forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
+  disp(strcat('DEBUG: goalForce forceFromGoal:', num2str(forceFromGoal)));
   % disp('DEBUG: -------------------------');
   % disp(strcat('DEBUG: current_goal_num:', num2str(current_goal_num)));
   % disp(strcat('DEBUG: path:', num2str(path)));
@@ -59,6 +60,7 @@ function this_delta = goalForce(agent_num)
     current_goal = path(current_goal_num);
     G = goalArray(path(current_goal_num),:); %get the goal array
     forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
+    disp(strcat('DEBUG: goalForce forceFromGoal:', num2str(forceFromGoal)));
     % fprintf(fileID,'Agent:%2.0f G = %4.0f %4.0f %4.0f %4.0f\n', agent, G );
   end
   %disp("EE");

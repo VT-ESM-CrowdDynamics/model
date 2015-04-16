@@ -9,9 +9,12 @@ function new_position = rate_limit(agent_num)
   
   this_last_position = tminus1(2*agent_num-1:2*agent_num);
   this_last_delta = last_delta(2*agent_num-1:2*agent_num);
+  disp(strcat('DEBUG: rate_limit this_last_delta:', num2str(this_last_delta)));
 
   %get this agents force
   Force = buffer(tminus(0), 2*agent_num + 1 : 2*agent_num + 2);
+  disp(strcat('DEBUG: rate_limit Force:', num2str(Force)));
+
 
   % calculate the new position att + vt + x
   new_position = this_last_position + Force * (configuration.dt) ^ 2 + this_last_delta * configuration.dt;
@@ -24,6 +27,7 @@ function new_position = rate_limit(agent_num)
     direction = this_last_delta/norm(this_last_delta);
     % set velocity in that direction to be max velocity
     this_last_delta = velocity_upper_limits(agent_num)*direction;
+    disp(strcat('DEBUG: rate_limit new this_last_delta:', num2str(this_last_delta)));
     % calculate new position with max velocity
     new_positionw = this_last_position + this_last_delta*configuration.dt;
     %disp(previousPos);
