@@ -1,77 +1,84 @@
-% 1;
+function this_delta = goalForce(agent_num)
 
+  global buffer;
+  % disp(buffer);
+  tminus2 = buffer(tminus(2), 3:end);
+  tminus1 = buffer(tminus(1), 3:end);
+  last_delta = tminus2-tminus1;
+  
+  this_last_position = tminus1(2*agent_num-1:2*agent_num);
 
-function forceFromGoal = goalForce(agentPosVector, goalPoint1, goalPoint2, maxDistence, agentVelVector)
+  global current_goals;
+  current_goal_num = current_goals(agent_num);
+  % conditional skip for nonconforming function
+  if isnan(this_last_position(1))
+    this_delta = [0, 0; current_goal_num, 0];
+    return
+  end
 
-	%vector from all point to agent
-	relative = agentPosVector - goalPoint1;
-	%vector representing line segment
-	lineVector = goalPoint2 - goalPoint1;
-	%needed constants looked up formula online
-	c1 = dot(relative, lineVector) ;
-	c2 = dot(lineVector, lineVector);
-	%length of line
-	length = norm(lineVector);
-	%dummy variables
-	force = -3000;
-	forceFromGoal = [0,0];
-	%prjectionMagnitude = 0;
-	%if (length > 0)
-	%projectionMagnitude = dot(relative, lineVector)/length^2;
-	%end
-	if (c1 <= 0)
-		%beyond goalPoint1
-		distence1 = norm(agentPosVector-goalPoint1); %distence from goalPoint to person
-		if (distence1 > maxDistence+50)	
-			direction = (agentPosVector - goalPoint1)/distence1;
-			%force = -500; 
-			forceFromGoal = force*direction;
-		else
-			%the person is at the goal!
-			%disp("AT GOALLLLL")
+  this_last_delta = last_delta(2*agent_num-1:2*agent_num);
+  this_delta = this_last_position+[agent_num,1];
 
-			
-		end
-	elseif (c2 <= c1)
-		%beyond goalPoint2
-		
-		distence2 = norm(agentPosVector-goalPoint2); %distence from goalPoint to person
-		if (distence2 > maxDistence+50)	
-			direction = (agentPosVector - goalPoint1)/distence2;
-			%force = -500; 
-			forceFromGoal = force*direction;
-		else
-			%the person is at the goal!
+  global goal_paths;
+  global velocity_upper_limits;
+  global spawn_points;
+  global configuration;
 
-			%disp("AT GOALLLLL")
+  path_num = goal_paths(agent_num);
 
-		end
-	else 
-		d = c1/c2;
-		pb = goalPoint1 + d*lineVector; %point on line closest to person
-		distence3 = norm(agentPosVector-pb); %distence from wall to person
+  max_distance = velocity_upper_limits(agent_num)*configuration.dt;
+  % disp(strcat('DEBUG: max_distance ', num2str(max_distance)));
 
-		if (distence3 > maxDistence+50)	
+  % array of goals [x1,y1,x2,y2] for each goal
+  goalArray = [[-4,-20,4,-20];[-4,0,4,0];[-4,0,-4,8];[4,0,4,8];[-14,0,-14,8];[14,0,14,8]]*300; % lines across halls in T
+  % array of possible paths from goal to goal, path# assigned randomly to each agent
+  % for example in T intersection can have two path# each to one exit
+  % in form goalPath(path#,:, spawnPt) gives an array like [2,5] to call configuration.goalArray(2) then configuration.goalArray(5)
+  % as the agent moves from goal to goal
+  goalPath = cat(3,[2,3,5;2,4,6],[3,2,1;3,4,6],[4,2,1;4,3,5]);
 
-			direction = (agentPosVector - pb)/distence3;
-			%force = -500; 
-			forceFromGoal = force*direction;
-			% we only want to apply a 'move to the right side of a hallway force' 
-		% if the person is still headed towords the goal 
-		% hopefully this will prevent someone from going down a hallway on their right
-		% without it being a goal
-			if (norm(pb-goalPoint1) > 500 && norm(pb-goalPoint2) > 500)
-			forceFromGoal = forceFromGoal + goRight(-1*direction);
-			end
-		else
-			%at the goal
-
-			%disp("AT GOALLLLL")
-
-		end
-		
-		
-	end 
+  % originally G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
+  path = goalPath(path_num, :, spawn_points(agent_num));
+  current_goal = path(current_goal_num);
+  G = goalArray(path(current_goal_num),:); %get the goal array
+  forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
+  disp(strcat('DEBUG: goalForce forceFromGoal:', num2str(forceFromGoal)));
+  % disp('DEBUG: -------------------------');
+  % disp(strcat('DEBUG: current_goal_num:', num2str(current_goal_num)));
+  % disp(strcat('DEBUG: path:', num2str(path)));
+  %fprintf(fileID,'Agent: %3.0f forceGoal1 -> x is %8.0f , y is %8.0f\n', agent, forceFromGoal);
+  % while the goal force is zero and there are more goals in the path calc a new force with the next goal 
+  % if the agent is close to a goal then make the next goal active
+  % the agent could possibly satisfy multiple goals at once -> while loop
+  % disp(strcat('DEBUG: length(path):', num2str(length(path))));
+  while(norm(forceFromGoal) < 1 && current_goal_num < length(path))
+    %disp("in the goal loop")
+    % fprintf(fileID,'Agent:%2.0f forceGoalLOOP -> # %5.0f\n', agent, current_goal_num );
+    current_goal_num = current_goal_num + 1;
+    % originally G = goalArray(agentStruct(agent).goalPath(agentStruct(agent).goalNum),:);
+    path = goalPath(path_num,:, spawn_points(agent_num));
+    current_goal = path(current_goal_num);
+    G = goalArray(path(current_goal_num),:); %get the goal array
+    forceFromGoal = goalForceHelper(this_last_position, [G(1),G(2)],[G(3),G(4)], max_distance, this_last_delta); % get goal force from function
+    disp(strcat('DEBUG: goalForce forceFromGoal:', num2str(forceFromGoal)));
+    % fprintf(fileID,'Agent:%2.0f G = %4.0f %4.0f %4.0f %4.0f\n', agent, G );
+  end
+  %disp("EE");
+  if (norm(forceFromGoal) < 1)
+    %disp("REMOVE")
+    %remove agent they are at the final goal
+    forceFromGoal = [NaN NaN];
+    % fprintf(fileID,'Agent:%2.0f REMOVED!! -> x%5.0f , y%5.0f\n , norm =%5.0f\n', agent, forceFromGoal, norm(forceFromGoal));
+  end
+  this_delta = forceFromGoal;
+  this_delta(2,1) = current_goal_num;
+  
+  % disp('DEBUG: -------------------------');
+  % disp(strcat('DEBUG: current_goal_num:', num2str(current_goal_num)));
+  % disp('DEBUG: -------------------------');
+  % disp(strcat('DEBUG: goalforce:', num2str(forceFromGoal)));
+  % % disp(strcat('DEBUG: current_goal:', num2str(current_goal)));
+  % disp(strcat('DEBUG: max_distance:', num2str(max_distance)));
+  % disp(strcat('DEBUG: norm(forceFromGoal):', num2str(norm(forceFromGoal))));
 end
 
-% test goalForce.m

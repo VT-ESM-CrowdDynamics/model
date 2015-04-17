@@ -1,7 +1,6 @@
 {
 	"dt": "NaN",
 	"frames": "NaN",
-	"agents": 0,
-	"goal": "NaN",
+	"agents": "NaN",
 	"buffer_size": 5
 }

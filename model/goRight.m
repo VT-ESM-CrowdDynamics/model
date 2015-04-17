@@ -1,8 +1,8 @@
- 
+% lane formation
 function rightForce = goRight(vel)
-	
-	rightForce = 0;
-	if (norm(vel) != 0)
+  
+  rightForce = 0;
+  if (norm(vel) != 0)
   rightForce = 500*[vel(2) -1*vel(1)]/norm(vel);
     end
 end
