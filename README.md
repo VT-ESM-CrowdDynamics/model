@@ -20,9 +20,8 @@ configuration, the MXE Build should be fine.
 After downloading and extracting the archive, or cloning the repo, the model can
 be run with or by modifying the demo script in the model directory. This will be
 a bat file on Windows, or an sh file on OSX/Linux/Cygwin. It requires Octave to
-be in the path. For Windows, add C:\Octave\Octave-[version]\bin(
-(see)[http://windowsitpro.com/systems-management/how-can-i-add-new-folder-my-system-path]
-).
+be in the path. For Windows, add C:\Octave\Octave-[version]\bin
+([see this](http://windowsitpro.com/systems-management/how-can-i-add-new-folder-my-system-path)).
 
 The model can be adjusted by changing parameters in the demo script, and in the
 force functions and engine M files.
