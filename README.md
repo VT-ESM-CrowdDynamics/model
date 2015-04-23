@@ -16,3 +16,8 @@ Octave can be downloaded for Windows from several
 version is presently recommended as the parallel package should be buildable,
 which is required for newpattern. Otherwise, or if turning off parallel in the
 configuration, the MXE Build should be fine.
+
+After downloading and extracting the archive, or cloning the repo, the model can
+be run with or by modifying the demo script in the model directory. It can be
+adjusted by changing parameters here, and in the force functions and engine M
+files.
